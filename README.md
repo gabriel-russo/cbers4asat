@@ -114,7 +114,7 @@ print(produtos)
 from cbers4asat import Cbers4aAPI
 from datetime import date
 
-api = Cbers4aAPI('seu.login@email.com')
+api = Cbers4aAPI('seu.login@email.com') # Para fazer download, o email é obrigatório
 bbox = (229, 124)
 
 data_inicial = date(2021, 8, 25)
@@ -124,17 +124,23 @@ produtos = api.query(location=bbox,
                      initial_date=data_inicial, 
                      end_date=data_final, 
                      cloud=100, 
-                     limit=3,
+                     limit=1,
                      collections=['CBERS4A_WPM_L4_DN'])
-# [{'type': 'Feature', 'id': 'CBERS4A_WPM22812420210904' ... },...]
 
 # Bandas escolhidas: vermelha, verde e azul
 # Output do download é opcional, caso omitido será usado o diretório atual
-api.download(produtos[0], 
-             ['red','green','blue'], 
-             3, # Numero de threads que irão ser usadas do processador
-             './downloads',
-             True) # Agrupar bandas de uma cena(s) em subpasta(s) no diretório ./downloads
+api.download(products=produtos, 
+             bands=['red','green','blue'], 
+             threads=3, # Numero de threads que irão ser usadas do processador
+             outdir='./downloads',
+             with_folder=True) # Agrupar bandas de uma cena(s) em subpasta(s) no diretório ./downloads
+
+# O diretório downloads ficará assim com o with_folter=true :
+ # download/
+ # +- CBERS4A_WPM22912420210830/
+ # ++- CBERS_4A_WPM_20210830_229_124_L4_BAND3.tif
+ # ++- CBERS_4A_WPM_20210830_229_124_L4_BAND2.tif
+ # ++- CBERS_4A_WPM_20210830_229_124_L4_BAND1.tif
 ```
 
 ### Converter para GeoDataFrame:
