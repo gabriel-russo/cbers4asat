@@ -1,7 +1,7 @@
 # Cbers4asat
 
 ## Descrição
-Biblioteca Python para consultar o catálogo e realizar operações com dados do CBERS4A
+Biblioteca Python para consultar o catálogo e realizar operações com dados do CBERS4A e AMAZONIA1
 
 ## Sumário
 * [Descrição](#descrio-biblioteca)
@@ -35,7 +35,7 @@ Biblioteca Python para consultar o catálogo e realizar operações com dados do
     - **limit** -> `int` : Limite de cenas que irão retornar na busca
     - **collections** (*Opcional*) -> `List[str]` : Coleção(ões) de imagens.
 ----
-  - download: *Baixar bandas de uma cena*
+  - download: *Baixar banda(s) das cenas retornadas do método `query`*
     - Parâmetros:
       - **products** -> `Dict | GeoDataFrame` : A cena escolhida retornada da API
       - **bands** -> `List[str]` : Banda(s) escolhida(s) dentre as disponíveis na cena
@@ -45,8 +45,8 @@ Biblioteca Python para consultar o catálogo e realizar operações com dados do
 ----
   - to_geodataframe: *Transformar dicionário no formato GeoJSON em GeoDataFrame*
     - Parâmetros:
-      - **products** -> `List[Dict]` : As cenas retornados da API
-      - **crs** -> `str` : Sistema de referência (ex: EPSG:4326)
+      - **products** -> `Dict` : As cenas retornados da API
+      - **crs** (*Opcional*)-> `str` : Sistema de referência (ex: EPSG:4326)
 ----
 ## Exemplos
 
@@ -204,5 +204,5 @@ Copyright (c) 2022 Gabriel Russo
 
 Copyright (c) 2020 Sandro Klippel
 
-O uso é fornecido sob a Licença do MIT. Veja em LICENSE
+O uso é fornecido sob a Licença do MIT. Veja em [LICENSE](https://github.com/gabriel-russo/cbers4asat/blob/master/LICENSE)
 para mais detalhes.
