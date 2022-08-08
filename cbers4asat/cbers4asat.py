@@ -189,7 +189,7 @@ class Cbers4aAPI:
             raise TypeError("Bad Arguments")
 
     @staticmethod
-    def to_geodataframe(products: Dict, crs=None):
+    def to_geodataframe(products: Dict, crs: str = 'EPSG:4326'):
         """
         Transform products list to a GeoDataFrame
 
@@ -199,8 +199,5 @@ class Cbers4aAPI:
         Returns:
             GeoDataFrame
         """
-        if crs is None:
-            crs = 'EPSG:4326'
-
         return GeoDataFrame.from_features(products, crs=crs).set_index(
             json_normalize(products["features"])["id"].values)
