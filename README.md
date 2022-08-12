@@ -3,6 +3,15 @@
 ## Descrição
 Biblioteca Python para consultar o catálogo e realizar operações com dados do CBERS4A e AMAZONIA1
 
+ [![Latest Version](https://img.shields.io/pypi/v/cbers4asat?style=plastic)](https://pypi.python.org/pypi/cbers4asat/)
+ [![Latest Version](https://img.shields.io/pypi/l/cbers4asat?style=plastic)](https://pypi.python.org/pypi/cbers4asat/)
+ [![Latest Version](https://img.shields.io/pypi/pyversions/cbers4asat?style=plastic)](https://pypi.python.org/pypi/cbers4asat/)
+ [![Latest Version](https://img.shields.io/pypi/dd/cbers4asat?style=plastic)](https://pypi.python.org/pypi/cbers4asat/)
+
+## Download da biblioteca com pip
+
+`pip install cbers4asat`
+
 ## Sumário
 * [Descrição](#descrio-biblioteca)
 * [Build da biblioteca](#build-da-bibilioteca)
@@ -13,6 +22,7 @@ Biblioteca Python para consultar o catálogo e realizar operações com dados do
     * [Download de produtos](#download-de-produtos)
     * [Converter produtos para GeoDataFrame](#converter-para-geodataframe)
     * [Download de produtos no GeoDataFrame ](#download-de-produtos-no-geodataframe)
+* [Lista de desejos](#lista-de-desejos)
 * [License](#license)
 
 ## Build da bibilioteca
@@ -198,6 +208,12 @@ gdf = api.to_geodataframe(produtos)
 
 api.download(products=gdf, bands=['red'], outdir='./downloads', with_folder=False)
 ```
+
+## Lista de desejos:
+
+- [ ] Testes unitários
+- [ ] Filtros e ordenação para produtos no formato Dicionário
+- [ ] Filtro de cobertura de nuvem por intervalo
 
 # License
 Copyright (c) 2022 Gabriel Russo
