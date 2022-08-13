@@ -15,6 +15,14 @@ class Cbers4aAPI:
     def __init__(self, user):
         self._user = user
 
+    @property
+    def user(self):
+        return self._user
+
+    @user.setter
+    def user(self, user):
+        self._user = user
+
     @staticmethod
     def query(*, location: Union[List[float] | Tuple], initial_date: date, end_date: date,
               cloud: int, limit: int, collections: List[str] = None):
