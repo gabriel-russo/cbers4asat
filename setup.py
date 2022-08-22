@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
         name='cbers4asat',
-        version='0.5',
+        version='0.6',
         description='Biblioteca Python para consultar o catálogo e realizar operações com dados do CBERS4A',
         url='https://github.com/gabriel-russo/cbers4asat',
         author='Gabriel Russo',
@@ -15,8 +15,6 @@ setup(
         long_description=long_description,
         long_description_content_type="text/markdown",
         classifiers=[
-                "Programming Language :: Python :: 3.7",
-                "Programming Language :: Python :: 3.8",
                 "Programming Language :: Python :: 3.9",
                 "Programming Language :: Python :: 3.10",
                 "License :: OSI Approved :: MIT License",
