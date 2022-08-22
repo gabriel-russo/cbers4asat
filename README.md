@@ -20,6 +20,7 @@ Biblioteca Python para consultar o catálogo e realizar operações com dados do
 * [Exemplos básicos](#exemplos)
     * [Buscando produtos com bounding box](#buscando-produtos-com-bounding-box)
     * [Buscando produtos com órbita e ponto](#buscando-produtos-com-órbita-e-ponto)
+    * [Buscando produto(s) por ID](#buscando-produtos-por-id)
     * [Download de produtos](#download-de-produtos)
     * [Converter coleção de produtos para GeoDataFrame](#converter-coleção-de-produtos-para-geodataframe)
     * [Download de produtos no GeoDataFrame ](#download-de-produtos-no-geodataframe)
@@ -37,6 +38,10 @@ Biblioteca Python para consultar o catálogo e realizar operações com dados do
     - **cloud** -> `int` : Porcentagem máxima de nuvem da busca
     - **limit** -> `int` : Limite de quantidade de produtos que irão ser retornados na busca
     - **collections** (*Opcional*) -> `List[str]` : Coleção(ões) de imagens.
+----
+- query_by_id: *Fazer uma busca por ID do produto*
+  - Parâmetros:
+    - **id** -> `str | List[str]` : Um ID **ou** uma lista de IDs das cenas
 ----
   - download: *Baixar banda(s) das cenas retornadas do método `query`*
     - Parâmetros:
@@ -108,6 +113,25 @@ produtos = api.query(location=path_row,
 
 print(produtos)
 # {'type': 'FeatureCollection', 'features': [{'type': 'Feature', 'id': 'CBERS4A_WPM22912420210830', ...
+```
+
+### Buscando produtos por ID
+```python
+from cbers4asat import Cbers4aAPI
+
+api = Cbers4aAPI('meu@email.com')
+
+# Buscando pelo ID de uma cena
+produto = api.query_by_id('CBERS4A_WPM22912420210830')
+
+print(produto)
+
+# Para mais de um produto:
+
+produtos = api.query_by_id(['CBERS4A_WPM22912420210830', 'AMAZONIA1_WFI03901620210911CB11'])
+
+print(produtos)
+
 ```
 
 ### Download de produtos:
