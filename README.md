@@ -4,10 +4,10 @@
 Biblioteca Python para consultar o catálogo e realizar operações com dados do CBERS4A e AMAZONIA1.
 
  [![Latest Version](https://img.shields.io/pypi/v/cbers4asat?style=plastic)](https://pypi.python.org/pypi/cbers4asat/)
- [![Latest Version](https://img.shields.io/pypi/l/cbers4asat?style=plastic)](https://pypi.python.org/pypi/cbers4asat/)
+ [![Latest Version](https://img.shields.io/pypi/l/cbers4asat?style=plastic)](https://github.com/gabriel-russo/cbers4asat/blob/master/LICENSE)
  [![Latest Version](https://img.shields.io/pypi/pyversions/cbers4asat?style=plastic)](https://pypi.python.org/pypi/cbers4asat/)
  [![Latest Version](https://img.shields.io/pypi/dm/cbers4asat?style=plastic)](https://pypi.python.org/pypi/cbers4asat/)
-
+ ![PyPI - Status](https://img.shields.io/pypi/status/cbers4asat?style=plastic)
 > [Read this README in english](https://github.com/gabriel-russo/cbers4asat/blob/master/en-US_README.md) :us:
 
 ## Download da biblioteca com pip
@@ -39,7 +39,7 @@ Biblioteca Python para consultar o catálogo e realizar operações com dados do
     - **limit** -> `int` : Limite de quantidade de produtos que irão ser retornados na busca
     - **collections** (*Opcional*) -> `List[str]` : Coleção(ões) de imagens.
 ----
-- query_by_id: *Fazer uma busca por ID do produto*
+- query_by_id: *Fazer uma busca por ID do(s) produto(s)*
   - Parâmetros:
     - **id** -> `str | List[str]` : Um ID **ou** uma lista de IDs das cenas
 ----
@@ -227,8 +227,8 @@ api.download(products=gdf, bands=['red'], outdir='./downloads', with_folder=Fals
 
 ## Contribuição
 
-Convido qualquer pessoa a participar contribuindo com código, relatando bugs, 
-corrigindo bugs, escrevendo documentação e tutoriais e discutindo o futuro deste projeto.
+Convido qualquer pessoa a participar contribuindo com código, corrindo e relatando bugs, 
+escrevendo documentação, tutoriais e discutindo o futuro deste projeto.
 
 Para mais informações de como contribuir ao projeto, leia [ao manual de contribuição](https://github.com/gabriel-russo/cbers4asat/blob/master/CONTRIBUTING.md)
 
