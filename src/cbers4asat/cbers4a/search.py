@@ -10,9 +10,9 @@ class Search(object):
     """Simple class to search INPE STAC Catalog"""
 
     # INPE STAC Catalog
-    base_url = 'http://www2.dgi.inpe.br/inpe-stac'
-    collection_endpoint = '/collections'
-    search_endpoint = '/search'
+    base_url = "http://www2.dgi.inpe.br/inpe-stac"
+    collection_endpoint = "/collections"
+    search_endpoint = "/search"
 
     # http
     # timeout = 12
@@ -36,22 +36,26 @@ class Search(object):
         """
         docstring
         """
-        query_keys = search_keys.pop('query', None)
+        query_keys = search_keys.pop("query", None)
         if query_keys is not None:
             self.query(**query_keys)
         self.update(**search_keys)
-        if 'ids' in self.search_keys:
+        if "ids" in self.search_keys:
             features = []
-            for id_ in self.search_keys['ids']:
-                r = self.session.get(self.base_url + self.collection_endpoint + '/X/items/' + id_)
+            for id_ in self.search_keys["ids"]:
+                r = self.session.get(
+                    self.base_url + self.collection_endpoint + "/X/items/" + id_
+                )
                 r.raise_for_status()
                 if r.status_code == 200:
                     feat = r.json()
-                    if feat['type'] == 'Feature':
+                    if feat["type"] == "Feature":
                         features.append(feat)
             return ItemCollection({"type": "FeatureCollection", "features": features})
         else:
-            r = self.session.post(self.base_url + self.search_endpoint, json=self.search_keys)
+            r = self.session.post(
+                self.base_url + self.search_endpoint, json=self.search_keys
+            )
             r.raise_for_status()
             if r.status_code == 200:
                 return ItemCollection(r.json())
@@ -85,10 +89,10 @@ class Search(object):
         """
         docstring
         """
-        if 'query' in self.search_keys:
-            self.search_keys['query'].update(properties_keys)
+        if "query" in self.search_keys:
+            self.search_keys["query"].update(properties_keys)
         else:
-            self.search_keys.update({'query': properties_keys})
+            self.search_keys.update({"query": properties_keys})
 
     def bbox(self, bbox: list) -> None:
         """
@@ -110,7 +114,7 @@ class Search(object):
         """
         docstring
         """
-        self.update(datetime=f'{start}T00:00:00Z/{end}T23:59:00Z')
+        self.update(datetime=f"{start}T00:00:00Z/{end}T23:59:00Z")
 
     def intersects(self, intersects):
         """
@@ -140,13 +144,13 @@ class Search(object):
         """
         docstring
         """
-        self.query(path={'eq': path}, row={'eq': row})
+        self.query(path={"eq": path}, row={"eq": row})
 
     def cloud_cover(self, op, cloud_cover):
         """
         docstring
         """
-        stac_op = {'>=': 'gte', '<=': 'lte', '=': 'eq', '>': 'gt', '<': 'lt'}
+        stac_op = {">=": "gte", "<=": "lte", "=": "eq", ">": "gt", "<": "lt"}
         try:
             self.query(cloud_cover={stac_op[op]: cloud_cover})
         except KeyError:

@@ -50,9 +50,10 @@ Python library to consume data from INPE'S CBERS4A and AMAZONIA1 catalog and per
 ## Examples
 
 ### Search by bounding box:
+
 ```python
 # Import cbers4asat and datetime lib
-from cbers4asat import Cbers4aAPI
+from src.cbers4asat import Cbers4aAPI
 from datetime import date
 
 # (Only required for downloading) Same Login used in http://www2.dgi.inpe.br/catalogo/explore
@@ -70,20 +71,21 @@ initial_date = date(2021, 8, 25)
 end_date = date(2021, 9, 25)
 
 # Do a search on inpe's catalog
-products = api.query(location=bbox, 
-                     initial_date=initial_date, 
-                     end_date=end_date, 
+products = api.query(location=bbox,
+                     initial_date=initial_date,
+                     end_date=end_date,
                      cloud=100,
                      limit=100,
-                     collections=['AMAZONIA1_WFI_L2_DN','CBERS4A_WPM_L4_DN']) #Optional
+                     collections=['AMAZONIA1_WFI_L2_DN', 'CBERS4A_WPM_L4_DN'])  # Optional
 
 print(products)
 # {'type': 'FeatureCollection', 'features': [{'type': 'Feature', 'id': 'AMAZONIA1_WFI03901620210911CB11', ...
 ```
 
 ### Search by path and row:
+
 ```python
-from cbers4asat import Cbers4aAPI
+from src.cbers4asat import Cbers4aAPI
 from datetime import date
 
 api = Cbers4aAPI('my@mail.com')
@@ -95,20 +97,21 @@ initial_date = date(2021, 8, 25)
 end_date = date(2021, 9, 25)
 
 # Fazer uma busca no catálogo e exibir resultados
-products = api.query(location=path_row, 
-                     initial_date=initial_date, 
-                     end_date=end_date, 
-                     cloud=100, 
+products = api.query(location=path_row,
+                     initial_date=initial_date,
+                     end_date=end_date,
+                     cloud=100,
                      limit=100,
-                     collections=['AMAZONIA1_WFI_L2_DN','CBERS4A_WPM_L4_DN']) #Optional
+                     collections=['AMAZONIA1_WFI_L2_DN', 'CBERS4A_WPM_L4_DN'])  # Optional
 
 print(products)
 # {'type': 'FeatureCollection', 'features': [{'type': 'Feature', 'id': 'CBERS4A_WPM22912420210830', ...
 ```
 
 ### Downloading products:
+
 ```python
-from cbers4asat import Cbers4aAPI
+from src.cbers4asat import Cbers4aAPI
 from datetime import date
 
 api = Cbers4aAPI('my@mail.com')
@@ -118,33 +121,33 @@ path_row = (229, 124)
 initial_date = date(2021, 8, 25)
 end_date = date(2021, 9, 25)
 
-products = api.query(location=path_row, 
-                     initial_date=initial_date, 
-                     end_date=end_date, 
-                     cloud=100, 
+products = api.query(location=path_row,
+                     initial_date=initial_date,
+                     end_date=end_date,
+                     cloud=100,
                      limit=1,
                      collections=['CBERS4A_WPM_L4_DN'])
 
 # Chosen bands: red, green and blue
 # Output is optional, if you not fill, the current directory is used
-api.download(products=products, 
-             bands=['red','green','blue'], 
-             threads=3, # Threads for simultaneous download
+api.download(products=products,
+             bands=['red', 'green', 'blue'],
+             threads=3,  # Threads for simultaneous download
              outdir='./downloads',
-             with_folder=True) # Group downloaded bands into subfolder(s) in the ./downloads directory
+             with_folder=True)  # Group downloaded bands into subfolder(s) in the ./downloads directory
 
 # ./downloads directory will be like this if with_folder=true :
- # downloads/
- # +- CBERS4A_WPM22912420210830/
- # ++- CBERS_4A_WPM_20210830_229_124_L4_BAND3.tif
- # ++- CBERS_4A_WPM_20210830_229_124_L4_BAND2.tif
- # ++- CBERS_4A_WPM_20210830_229_124_L4_BAND1.tif
+# downloads/
+# +- CBERS4A_WPM22912420210830/
+# ++- CBERS_4A_WPM_20210830_229_124_L4_BAND3.tif
+# ++- CBERS_4A_WPM_20210830_229_124_L4_BAND2.tif
+# ++- CBERS_4A_WPM_20210830_229_124_L4_BAND1.tif
 ```
 
 ### Convert products collection to GeoDataFrame:
 
 ```python
-from cbers4asat import Cbers4aAPI
+from src.cbers4asat import Cbers4aAPI
 from datetime import date
 import geopandas as gpd
 
@@ -155,10 +158,10 @@ path_row = (229, 124)
 initial_date = date(2021, 8, 25)
 end_date = date(2021, 9, 25)
 
-products = api.query(location=path_row, 
-                     initial_date=initial_date, 
-                     end_date=end_date, 
-                     cloud=100, 
+products = api.query(location=path_row,
+                     initial_date=initial_date,
+                     end_date=end_date,
+                     cloud=100,
                      limit=3,
                      collections=['CBERS4A_WPM_L4_DN'])
 
@@ -170,7 +173,7 @@ print(gdf.to_string())
 ### Downloading products in GeoDataFrame:
 
 ```python
-from cbers4asat import Cbers4aAPI
+from src.cbers4asat import Cbers4aAPI
 from datetime import date
 import geopandas as gpd
 
@@ -184,10 +187,10 @@ bbox = [-63.92944335937501,
 initial_date = date(2021, 8, 25)
 end_date = date(2021, 9, 25)
 
-products = api.query(location=bbox, 
-                     initial_date=initial_date, 
-                     end_date=end_date, 
-                     cloud=100, 
+products = api.query(location=bbox,
+                     initial_date=initial_date,
+                     end_date=end_date,
+                     cloud=100,
                      limit=3,
                      collections=['CBERS4A_WPM_L4_DN'])
 

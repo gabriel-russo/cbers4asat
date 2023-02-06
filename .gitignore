@@ -4,3 +4,5 @@ build
 dist
 cbers4asat.egg-info
 venv
+.tox
+.pytest_cache

@@ -16,7 +16,7 @@ class Collections(object):
         docstring
         """
         try:
-            return next(filter(lambda i: i['id'] == k, self._data['collections']))
+            return next(filter(lambda i: i["id"] == k, self._data["collections"]))
         except StopIteration:
             raise KeyError(k)
 
@@ -24,17 +24,20 @@ class Collections(object):
         """
         docstring
         """
-        for i in [(collection['id'], collection['description']) for collection in self._data['collections']]:
+        for i in [
+            (collection["id"], collection["description"])
+            for collection in self._data["collections"]
+        ]:
             yield i
 
     def get_spatial_extent(self, id):
         """
         docstring
         """
-        return self.__getitem__(id)['extent']['spatial']
+        return self.__getitem__(id)["extent"]["spatial"]
 
     def get_temporal_extent(self, id):
         """
         docstring
         """
-        return self.__getitem__(id)['extent']['temporal']
+        return self.__getitem__(id)["extent"]["temporal"]

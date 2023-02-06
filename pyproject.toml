@@ -1,0 +1,46 @@
+[project]
+name = "cbers4asat"
+version = "0.6.1"
+description = "Biblioteca Python para consultar o catálogo e realizar operações com dados do CBERS4A"
+authors = [
+    { name = "Gabriel Russo", email = "gabrielrusso@protonmail.com" }]
+license = { file = "LICENSE" }
+keywords = ["cbers", "cbers4a", "remote sensing", "geoprocessing"]
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering :: GIS"
+]
+dependencies = [
+    "geopandas>=0.9",
+    "requests>=2.25.1",
+    "pandas>=1.3.5"
+]
+
+[build-system]
+build-backend = "hatchling.build"
+requires = ["hatchling>=1.11.0"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/cbers4asat"]
+
+[tool.hatch.envs.default]
+dependencies = [
+    "tox",
+    "pytest",
+    "black",
+    "flake8"
+]
+
+[tool.hatch.envs.default.scripts]
+test = "tox"
+
+[project.urls]
+"Homepage" = "https://github.com/gabriel-russo/cbers4asat"
+"Bug Tracker" = "https://github.com/gabriel-russo/cbers4asat/issues"
+"Repository" = "https://github.com/gabriel-russo/cbers4asat.git"

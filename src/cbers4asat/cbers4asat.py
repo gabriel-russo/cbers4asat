@@ -11,7 +11,6 @@ from pandas import json_normalize
 
 
 class Cbers4aAPI:
-
     def __init__(self, user):
         self._user = user
 
@@ -24,8 +23,15 @@ class Cbers4aAPI:
         self._user = user
 
     @staticmethod
-    def query(*, location: Union[List[float] | Tuple], initial_date: date, end_date: date,
-              cloud: int, limit: int, collections: List[str] = None):
+    def query(
+        *,
+        location: Union[List[float] | Tuple],
+        initial_date: date,
+        end_date: date,
+        cloud: int,
+        limit: int,
+        collections: List[str] = None,
+    ):
         """
         Query Images from INPE's catalog
 
@@ -59,7 +65,7 @@ class Cbers4aAPI:
         Returns:
             dict: Dict with GeoJSON-like format
 
-         """
+        """
         search = Search()
 
         if not location:
@@ -74,7 +80,7 @@ class Cbers4aAPI:
             raise Exception("Provide a bbox or a path row")
 
         search.date(initial_date.isoformat(), end_date.isoformat())
-        search.cloud_cover('<=', cloud)
+        search.cloud_cover("<=", cloud)
         search.limit(limit)
 
         if collections is not None:
@@ -110,7 +116,7 @@ class Cbers4aAPI:
     # ----------------------------------------------
 
     def __check_for_exception(self, product, bands, outdir):
-        """ Search for exceptions block: empty product, empty bands, output dir does not exist"""
+        """Search for exceptions block: empty product, empty bands, output dir does not exist"""
 
         # Check for empty products in different contexts
         if isinstance(product, Dict):
@@ -120,19 +126,26 @@ class Cbers4aAPI:
             if product.empty:  # Check if data frame is empty
                 raise TypeError("No product to download")
         # ---
-        if not bands or bands == ['']:
+        if not bands or bands == [""]:
             raise TypeError("Choose bands to download")
         elif not isdir(outdir):
             raise NotADirectoryError("Choose a valid output directory")
 
-    def __download(self, products: Dict, bands: List[str], threads: int = cpu_count(),
-                   outdir: str = getcwd(), with_folder: bool = False):
-
+    def __download(
+        self,
+        products: Dict,
+        bands: List[str],
+        threads: int = cpu_count(),
+        outdir: str = getcwd(),
+        with_folder: bool = False,
+    ):
         self.__check_for_exception(products, bands, outdir)
 
         products = ItemCollection(products).items()
 
-        with ThreadPoolExecutor(max_workers=threads, thread_name_prefix='cbers4a') as pool:
+        with ThreadPoolExecutor(
+            max_workers=threads, thread_name_prefix="cbers4a"
+        ) as pool:
             if with_folder:
                 root = outdir  # Save the outdir start point (to looks like a pushd and popd)
             for product in products:
@@ -143,12 +156,19 @@ class Cbers4aAPI:
                 for band in bands:
                     pool.submit(product.download, band, self._user, outdir)
 
-    def __download_gdf(self, products: GeoDataFrame, bands: List[str], threads: int = cpu_count(),
-                       outdir: str = getcwd(), with_folder: bool = False):
-
+    def __download_gdf(
+        self,
+        products: GeoDataFrame,
+        bands: List[str],
+        threads: int = cpu_count(),
+        outdir: str = getcwd(),
+        with_folder: bool = False,
+    ):
         self.__check_for_exception(products, bands, outdir)
 
-        with ThreadPoolExecutor(max_workers=threads, thread_name_prefix='cbers4a_gdf') as pool:
+        with ThreadPoolExecutor(
+            max_workers=threads, thread_name_prefix="cbers4a_gdf"
+        ) as pool:
             if with_folder:
                 root = outdir  # Save the outdir start point (to looks like a pushd and popd)
             for index, row in products.iterrows():
@@ -164,16 +184,35 @@ class Cbers4aAPI:
                         pool.submit(product.download, band, self._user, outdir)
 
     @overload
-    def download(self, products: Dict, bands: List[str], threads: int = cpu_count(), outdir: str = getcwd(),
-                 with_folder: bool = False):
+    def download(
+        self,
+        products: Dict,
+        bands: List[str],
+        threads: int = cpu_count(),
+        outdir: str = getcwd(),
+        with_folder: bool = False,
+    ):
         ...
 
     @overload
-    def download(self, products: GeoDataFrame, bands: List[str], threads: int = cpu_count(), outdir: str = getcwd(),
-                 with_folder: bool = False):
+    def download(
+        self,
+        products: GeoDataFrame,
+        bands: List[str],
+        threads: int = cpu_count(),
+        outdir: str = getcwd(),
+        with_folder: bool = False,
+    ):
         ...
 
-    def download(self, products, bands, threads=cpu_count(), outdir=getcwd(), with_folder: bool = False):
+    def download(
+        self,
+        products,
+        bands,
+        threads=cpu_count(),
+        outdir=getcwd(),
+        with_folder: bool = False,
+    ):
         """
         Download bands from all given scenes
 
@@ -197,7 +236,7 @@ class Cbers4aAPI:
             raise TypeError("Bad Arguments")
 
     @staticmethod
-    def to_geodataframe(products: Dict, crs: str = 'EPSG:4326'):
+    def to_geodataframe(products: Dict, crs: str = "EPSG:4326"):
         """
         Transform products list to a GeoDataFrame
 
@@ -208,4 +247,5 @@ class Cbers4aAPI:
             GeoDataFrame
         """
         return GeoDataFrame.from_features(products, crs=crs).set_index(
-            json_normalize(products["features"])["id"].values)
+            json_normalize(products["features"])["id"].values
+        )
