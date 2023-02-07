@@ -10,8 +10,9 @@ Biblioteca Python para consultar o catálogo e realizar operações com dados do
 [![Latest Version](https://img.shields.io/pypi/dm/cbers4asat?style=plastic)](https://pypi.python.org/pypi/cbers4asat/)
 ![PyPI - Status](https://img.shields.io/pypi/status/cbers4asat?style=plastic)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Hatch project](https://img.shields.io/badge/%F0%9F%A5%9A-Hatch-4051b5.svg)](https://github.com/pypa/hatch)
 
-> [Read this README in english](https://github.com/gabriel-russo/cbers4asat/blob/master/en-US_README.md) :us:
+> [Read this README in english](https://github.com/gabriel-russo/cbers4asat/blob/master/en-US_README.md) 🇺🇸
 
 ## Download da biblioteca com pip
 
@@ -29,7 +30,7 @@ Biblioteca Python para consultar o catálogo e realizar operações com dados do
     * [Converter coleção de produtos para GeoDataFrame](#converter-coleção-de-produtos-para-geodataframe)
     * [Download de produtos no GeoDataFrame ](#download-de-produtos-no-geodataframe)
 * [Contribuição](#contribuição)
-* [Lista de melhorias](#lista-de-melhorias)
+* [Progresso do projeto](#progresso-do-projeto)
 * [Licença](#licença)
 
 ## Descrição: Métodos
@@ -244,19 +245,15 @@ api.download(products=gdf, bands=['red'], outdir='./downloads', with_folder=Fals
 
 ## Contribuição
 
-Convido qualquer pessoa a participar contribuindo com código, corrindo e relatando bugs,
+Convido qualquer pessoa a participar contribuindo com código, relatando bugs,
 escrevendo documentação, tutoriais e discutindo o futuro deste projeto.
 
 Para mais informações de como contribuir ao projeto,
 leia [ao manual de contribuição](https://github.com/gabriel-russo/cbers4asat/blob/master/CONTRIBUTING.md)
 
-## Lista de melhorias:
+## Progresso do projeto
 
-- [ ] Testes unitários
-- [ ] Filtros e ordenação para produtos no formato Dicionário
-- [ ] Filtro de cobertura de nuvem por intervalo
-- [ ] Salvar em GeoJSON
-- [ ] Método para mostrar Thumbnail das cenas
+Você pode acompanhar todo o progresso do desenvolvimento no [painel de projetos](https://github.com/gabriel-russo/cbers4asat/projects):
 
 # Licença
 
