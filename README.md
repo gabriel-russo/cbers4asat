@@ -8,10 +8,9 @@ Biblioteca Python para consultar o catálogo e realizar operações com dados do
 [![Latest Version](https://img.shields.io/pypi/l/cbers4asat?style=plastic)](https://github.com/gabriel-russo/cbers4asat/blob/master/LICENSE)
 [![Latest Version](https://img.shields.io/pypi/pyversions/cbers4asat?style=plastic)](https://pypi.python.org/pypi/cbers4asat/)
 [![Latest Version](https://img.shields.io/pypi/dm/cbers4asat?style=plastic)](https://pypi.python.org/pypi/cbers4asat/)
-![PyPI - Status](https://img.shields.io/pypi/status/cbers4asat?style=plastic)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Hatch project](https://img.shields.io/badge/%F0%9F%A5%9A-Hatch-4051b5.svg)](https://github.com/pypa/hatch)
-
+![GitHub Workflow Status](https://github.com/gabriel-russo/cbers4asat/actions/workflows/build-cbers4asat.yml/badge.svg)
 > [Read this README in english](https://github.com/gabriel-russo/cbers4asat/blob/master/en-US_README.md) 🇺🇸
 
 ## Download da biblioteca com pip
@@ -75,7 +74,7 @@ Biblioteca Python para consultar o catálogo e realizar operações com dados do
 
 ```python
 # Importar biblioteca do cbers4asat e datetime
-from src.cbers4asat import Cbers4aAPI
+from cbers4asat import Cbers4aAPI
 from datetime import date
 
 # (Requisito apenas para download) 
@@ -108,7 +107,7 @@ print(produtos)
 ### Buscando produtos com órbita e ponto:
 
 ```python
-from src.cbers4asat import Cbers4aAPI
+from cbers4asat import Cbers4aAPI
 from datetime import date
 
 api = Cbers4aAPI('seu.login@email.com')
@@ -133,7 +132,7 @@ print(produtos)
 ### Buscando produtos por ID
 
 ```python
-from src.cbers4asat import Cbers4aAPI
+from cbers4asat import Cbers4aAPI
 
 api = Cbers4aAPI('meu@email.com')
 
@@ -153,7 +152,7 @@ print(produtos)
 ### Download de produtos:
 
 ```python
-from src.cbers4asat import Cbers4aAPI
+from cbers4asat import Cbers4aAPI
 from datetime import date
 
 api = Cbers4aAPI('seu.login@email.com')
@@ -189,7 +188,7 @@ api.download(products=produtos,
 ### Converter coleção de produtos para GeoDataFrame:
 
 ```python
-from src.cbers4asat import Cbers4aAPI
+from cbers4asat import Cbers4aAPI
 from datetime import date
 import geopandas as gpd
 
@@ -216,7 +215,7 @@ print(gdf.to_string())
 ### Download de produtos no GeoDataFrame:
 
 ```python
-from src.cbers4asat import Cbers4aAPI
+from cbers4asat import Cbers4aAPI
 from datetime import date
 import geopandas as gpd
 
