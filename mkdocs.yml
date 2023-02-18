@@ -1,0 +1,9 @@
+site_name: cbers4asat
+
+nav:
+  - Inicio: index.md
+  - Instalação: installation.md
+  - Guia de Usuário: quickstart.md
+  - API Python: api_reference.md
+  - Exemplos: examples.md
+theme: readthedocs
