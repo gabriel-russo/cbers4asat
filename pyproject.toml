@@ -1,6 +1,6 @@
 [project]
 name = "cbers4asat"
-version = "0.6.1"
+version = "0.6.2"
 description = "Biblioteca Python para consultar o catálogo e realizar operações com dados do CBERS4A"
 authors = [
     { name = "Gabriel Russo", email = "gabrielrusso@protonmail.com" }]
@@ -12,6 +12,7 @@ classifiers = [
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Topic :: Scientific/Engineering :: GIS"
@@ -22,6 +23,11 @@ dependencies = [
     "pandas>=1.3.5"
 ]
 
+[project.optional-dependencies]
+dev = [
+    "hatch>=1.6.3"
+]
+
 [build-system]
 build-backend = "hatchling.build"
 requires = ["hatchling>=1.11.0"]
@@ -29,16 +35,30 @@ requires = ["hatchling>=1.11.0"]
 [tool.hatch.build.targets.wheel]
 packages = ["src/cbers4asat"]
 
+[tool.hatch.build]
+exclude = [
+    "tests/",
+    ".github/",
+    ".flake8",
+    "tox.ini"
+]
+
 [tool.hatch.envs.default]
 dependencies = [
-    "tox",
-    "pytest",
-    "black",
-    "flake8"
+    "tox>=4.4.4",
 ]
 
 [tool.hatch.envs.default.scripts]
 test = "tox"
+
+[tool.hatch.envs.docs]
+dependencies = [
+    "mkdocs>=1.4.2"
+]
+
+[tool.hatch.envs.docs.scripts]
+serve = "mkdocs serve"
+build = "mkdocs build --clean --strict"
 
 [project.urls]
 "Homepage" = "https://github.com/gabriel-russo/cbers4asat"
