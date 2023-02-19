@@ -46,9 +46,11 @@ exclude = [
 [tool.hatch.envs.default]
 dependencies = [
     "tox>=4.4.4",
+    "black>=23.1"
 ]
 
 [tool.hatch.envs.default.scripts]
+format = "black src/cbers4asat"
 test = "tox"
 
 [tool.hatch.envs.docs]
