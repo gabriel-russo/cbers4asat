@@ -25,7 +25,7 @@ class Cbers4aAPI:
     @staticmethod
     def query(
         *,
-        location: Union[List[float] | Tuple],
+        location: Union[List[float], Tuple],
         initial_date: date,
         end_date: date,
         cloud: int,
