@@ -8,6 +8,7 @@ from os.path import isdir, join
 from os import getcwd, cpu_count, mkdir
 from geopandas import GeoDataFrame
 from pandas import json_normalize
+from shapely.geometry import Polygon
 
 
 class Cbers4aAPI:
@@ -25,7 +26,7 @@ class Cbers4aAPI:
     @staticmethod
     def query(
         *,
-        location: Union[List[float], Tuple],
+        location: Union[List[float], Tuple, Polygon],
         initial_date: date,
         end_date: date,
         cloud: int,
@@ -76,6 +77,8 @@ class Cbers4aAPI:
         elif isinstance(location, tuple):
             path, row = location
             search.path_row(path, row)
+        elif isinstance(location, Polygon):
+            search.bbox(list(location.bounds))
         else:
             raise Exception("Provide a bbox or a path row")
 

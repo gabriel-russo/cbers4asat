@@ -2,6 +2,7 @@ from cbers4asat import Cbers4aAPI
 import pytest
 from datetime import date
 from os import remove
+from shapely.geometry import Polygon
 
 
 class MockStacFeatureCollectionResponse:
@@ -141,6 +142,34 @@ class TestCbers4aAPI:
 
         result = self.api.query(
             location=(206, 133),
+            initial_date=date(2021, 1, 1),
+            end_date=date(2021, 2, 1),
+            cloud=100,
+            limit=1,
+            collections=["CBERS4A_WPM_L4_DN"],
+        )
+
+        assert self.expected_result == result
+
+    def test_query_geometry(self, monkeypatch):
+        def mock_post(*args, **kwargs):
+            return MockStacFeatureCollectionResponse()
+
+        monkeypatch.setattr("requests.Session.post", mock_post)
+
+        bbox = Polygon(
+            [
+                [-63.911934, -8.738337],
+                [-63.912621, -8.805859],
+                [-63.912621, -8.805859],
+                [-63.798294, -8.738337],
+            ]
+        )
+
+        assert bbox.is_valid
+
+        result = self.api.query(
+            location=bbox,
             initial_date=date(2021, 1, 1),
             end_date=date(2021, 2, 1),
             cloud=100,
