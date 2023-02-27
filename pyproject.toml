@@ -1,6 +1,6 @@
 [project]
 name = "cbers4asat"
-version = "0.6.4"
+version = "0.6.5"
 description = "Biblioteca Python para consultar o catálogo e realizar operações com dados do CBERS4A"
 authors = [
     { name = "Gabriel Russo", email = "gabrielrusso@protonmail.com" }]
@@ -55,7 +55,9 @@ test = "tox"
 
 [tool.hatch.envs.docs]
 dependencies = [
-    "mkdocs>=1.4.2"
+    "mkdocs>=1.4.2",
+    "mkdocstrings>=0.20.0",
+    "mkdocstrings-python>=0.8.3"
 ]
 
 [tool.hatch.envs.docs.scripts]

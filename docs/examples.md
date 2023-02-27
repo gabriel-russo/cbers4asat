@@ -2,6 +2,7 @@
 
 * [Buscando produtos com bounding box](#buscando-produtos-com-bounding-box)
 * [Buscando produtos com órbita e ponto](#buscando-produtos-com-orbita-e-ponto)
+* [Buscando produtos com geometria](#buscando-produtos-com-geometria)
 * [Buscando produto(s) por ID](#buscando-produtos-por-id)
 * [Download de produtos](#download-de-produtos)
 * [Converter coleção de produtos para GeoDataFrame](#converter-colecao-de-produtos-para-geodataframe)
@@ -61,6 +62,41 @@ produtos = api.query(location=path_row,
                      cloud=100,
                      limit=100,
                      collections=['AMAZONIA1_WFI_L2_DN', 'CBERS4A_WPM_L4_DN'])
+
+print(produtos)
+# {'type': 'FeatureCollection', 'features': [{'type': 'Feature', 'id': 'CBERS4A_WPM22912420210830', ...
+```
+
+## Buscando produtos com geometria:
+
+```python
+from cbers4asat import Cbers4aAPI
+from datetime import date
+from shapely.geometry import Polygon
+
+api = Cbers4aAPI('seu.login@email.com')
+
+# A geometria deve ser do tipo Polygon, caso seja do tipo MultiPolygon, deve
+# utilizar o método "unary_union" para converter de MultiPolygon -> Polygon
+
+bbox = Polygon(
+    [
+        [-63.911934, -8.738337],
+        [-63.912621, -8.805859],
+        [-63.912621, -8.805859],
+        [-63.798294, -8.738337],
+    ]
+)
+
+data_inicial = date(2021, 8, 25)
+data_final = date(2021, 9, 25)
+
+produtos = api.query(location=bbox,
+                     initial_date=data_inicial,
+                     end_date=data_final,
+                     cloud=100,
+                     limit=1,
+                     collections=['CBERS4A_WPM_L4_DN'])
 
 print(produtos)
 # {'type': 'FeatureCollection', 'features': [{'type': 'Feature', 'id': 'CBERS4A_WPM22912420210830', ...
