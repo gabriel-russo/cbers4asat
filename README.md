@@ -4,6 +4,14 @@
 
 Biblioteca Python para consultar o catálogo e realizar operações com dados do CBERS4A e AMAZONIA1.
 
+A biblioteca `cbers4asat` surgiu da necessidade de automatizar a busca e manipulação de imagens do satélite
+sino-brasileiro CBERS-04A utilizando linguagens de programação.
+
+O design do projeto foi inspirado no [sentinelsat](https://github.com/sentinelsat/sentinelsat), onde é possível de forma
+intuitiva, pesquisar por imagens e realizar o download com poucas linhas de código, além de poder ser integrado com
+outras bibiliotecas como o geopandas.
+
+---
 [![Latest Version](https://img.shields.io/pypi/v/cbers4asat?style=plastic)](https://pypi.python.org/pypi/cbers4asat/)
 [![Latest Version](https://img.shields.io/pypi/l/cbers4asat?style=plastic)](https://github.com/gabriel-russo/cbers4asat/blob/master/LICENSE)
 [![Latest Version](https://img.shields.io/pypi/pyversions/cbers4asat?style=plastic)](https://pypi.python.org/pypi/cbers4asat/)
@@ -16,13 +24,30 @@ Biblioteca Python para consultar o catálogo e realizar operações com dados do
 > [Read this README in english (old version of docs)](https://github.com/gabriel-russo/cbers4asat/blob/master/en-US_README.md)
 > 🇺🇸
 
+## Busque imagens com poucas linhas de código
+
+```python
+from cbers4asat import Cbers4aAPI
+
+api = Cbers4aAPI('email@mail.com')
+
+path_row = (229, 124)
+
+api.query(location = path_row,
+          initial_date = date(2021, 6, 1),
+          end_date = date(2021, 7, 1),
+          cloud = 100,
+          limit = 10,
+          collections = ['AMAZONIA1_WFI_L2_DN', 'CBERS4A_WPM_L4_DN'])
+```
+
 ## Download da biblioteca com pip
 
 `pip install cbers4asat`
 
 ## Documentação
 
-Você pode ler a documentação no link abaixo
+Você pode ler a documentação da biblioteca no link abaixo
 
 > https://cbers4asat.readthedocs.io/
 
@@ -37,7 +62,7 @@ leia [ao manual de contribuição](https://github.com/gabriel-russo/cbers4asat/b
 ## Progresso do projeto
 
 Você pode acompanhar todo o progresso do desenvolvimento
-no [painel de projetos](https://github.com/gabriel-russo/cbers4asat/projects):
+no [painel de projetos](https://github.com/gabriel-russo/cbers4asat/projects)
 
 # Licença
 

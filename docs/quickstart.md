@@ -45,7 +45,8 @@ O retorno da busca (`query`) é um GeoJSON com todos os itens encontrados da col
 
 Nota-se que o GeoJSON possui [propriedades específicas da biblioteca STAC](https://stacspec.org/en/about/stac-spec/)
 
-Caso queira trabalhar com os resultados utilizando o `geopandas`, adicione essa linha de código após a busca:
+Caso queira trabalhar com os resultados utilizando o `geopandas` (recomendado), adicione essa linha de código após a
+busca:
 
 ```
 gdf = api.to_geodataframe(produtos, 'EPSG:4674')
@@ -53,9 +54,17 @@ gdf = api.to_geodataframe(produtos, 'EPSG:4674')
 
 ## Autenticação
 
-Para autentica-se com o `cbers4asat` é necessário possuir um cadastro na plataforma da DIVISÃO DE GERAÇÃO DE IMAGENS -
-INPE
+Para baixar imagens, é necessário autenticar-se no `cbers4asat` com o mesmo login da plataforma da DIVISÃO DE
+GERAÇÃO DE IMAGENS - INPE.
 
-Site:
+Caso não possua login, realize o cadastro no site:
 
 [http://www2.dgi.inpe.br/catalogo/explore](http://www2.dgi.inpe.br/catalogo/explore)
+
+## Coleções de imagens
+
+As coleções disponíveis para uso no método `query` pode ser encontrado
+no [mesmo site que é feito a autenticação](http://www2.dgi.inpe.br/catalogo/explore). Porém você pode utilizar a colinha
+abaixo:
+
+![Image Collections](img/collections.png)
