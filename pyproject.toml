@@ -27,6 +27,10 @@ dependencies = [
 dev = [
     "hatch>=1.6.3"
 ]
+tools = [
+    "rasterio>=1.3.6",
+    "numpy>=1.24.2"
+]
 
 [build-system]
 build-backend = "hatchling.build"
