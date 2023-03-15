@@ -28,22 +28,54 @@ outras bibiliotecas como o geopandas.
 
 ```python
 from cbers4asat import Cbers4aAPI
+from datetime import date
 
+# Inicializando a biblioteca
 api = Cbers4aAPI('email@mail.com')
 
+# Área de interesse (bbox, path row ou polígono)
 path_row = (229, 124)
 
-api.query(location = path_row,
-          initial_date = date(2021, 6, 1),
-          end_date = date(2021, 7, 1),
-          cloud = 100,
-          limit = 10,
-          collections = ['AMAZONIA1_WFI_L2_DN', 'CBERS4A_WPM_L4_DN'])
+# Buscando metadados
+produtos = api.query(location=path_row,
+                     initial_date=date(2021, 6, 1),
+                     end_date=date(2021, 7, 1),
+                     cloud=100,
+                     limit=10,
+                     collections=['AMAZONIA1_WFI_L2_DN', 'CBERS4A_WPM_L4_DN'])
+
+# Exibindo os resultados
+print(produtos)
+```
+
+## Utilize a caixa de ferramenta para os trabalhos mais comuns
+
+```python
+from cbers4asat.tools import rgbn_composite # Pansharpening em breve!
+import rasterio as rio
+from rasterio.plot import show
+
+# Criando a composição cor verdadeira
+rgbn_composite(red='./CBERS4A_WPM22812420210704/CBERS_4A_WPM_20210704_228_124_L4_BAND3.tif',
+               green='./CBERS4A_WPM22812420210704/CBERS_4A_WPM_20210704_228_124_L4_BAND2.tif',
+               blue='./CBERS4A_WPM22812420210704/CBERS_4A_WPM_20210704_228_124_L4_BAND1.tif',
+               nir='./CBERS4A_WPM22812420210704/CBERS_4A_WPM_20210704_228_124_L4_BAND4.tif',
+               filename='CBERS4A_WPM22812420210704_TRUE_COLOR.tif',
+               outdir='./STACK')
+
+# Plotando a imagem
+raster = rio.open("./STACK/CBERS4A_WPM22812420210704_TRUE_COLOR.tif")
+
+show(raster.read(), transform=raster.transform, with_bounds=True)
 ```
 
 ## Download da biblioteca com pip
 
 `pip install cbers4asat`
+
+Instalação com a caixa de ferramentas
+
+`pip install cbers4asat[tools]`
 
 ## Documentação
 
