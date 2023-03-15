@@ -7,6 +7,7 @@
 * [Download de produtos](#download-de-produtos)
 * [Converter coleção de produtos para GeoDataFrame](#converter-colecao-de-produtos-para-geodataframe)
 * [Download de produtos no GeoDataFrame ](#download-de-produtos-no-geodataframe)
+* [Empilhamento de bandas](#empilhamento-de-bandas)
 
 ## Buscando produtos com Bounding Box:
 
@@ -214,3 +215,30 @@ gdf = api.to_geodataframe(produtos)
 # Utiliza a mesma lógica que o download de produtos no formato dicionário
 api.download(products=gdf, bands=['red'], outdir='./downloads', with_folder=False)
 ```
+
+## Empilhamento de bandas
+
+```python
+from cbers4asat.tools import rgbn_composite
+import rasterio as rio
+from rasterio.plot import show
+
+# Criando uma composição COR VERDADEIRA
+
+# Cada parâmetro de cor representa o canal da imagem de saída
+
+# Banda NIR é opcional
+rgbn_composite(red='./CBERS4A_WPM22812420210704/CBERS_4A_WPM_20210704_228_124_L4_BAND3.tif',
+               green='./CBERS4A_WPM22812420210704/CBERS_4A_WPM_20210704_228_124_L4_BAND2.tif',
+               blue='./CBERS4A_WPM22812420210704/CBERS_4A_WPM_20210704_228_124_L4_BAND1.tif',
+               nir='./CBERS4A_WPM22812420210704/CBERS_4A_WPM_20210704_228_124_L4_BAND4.tif',
+               filename='CBERS4A_WPM22812420210704_TRUE_COLOR.tif',
+               outdir='./STACK')
+
+raster = rio.open("./STACK/CBERS4A_WPM22812420210704_TRUE_COLOR.tif")
+
+show(raster.read(), transform=raster.transform, with_bounds=True)
+```
+
+### Resultado
+![true color](img/rgbn_composite_true_color.png)

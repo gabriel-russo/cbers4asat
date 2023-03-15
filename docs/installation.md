@@ -1,8 +1,13 @@
 # Instalação
 
 Faça a instalação do `cbers4asat` com o pip
-```commandline
+```
 pip install cbers4asat
+```
+
+Instalação com a caixa de ferramentas
+```
+pip install cbers4asat[tools]
 ```
 
 ## Testes
@@ -13,7 +18,6 @@ git clone https://github.com/gabriel-russo/cbers4asat.git
 cd cbers4asat
 pip install -e .[dev]
 python -m hatch run test
-
 ```
 
 ## Versões do python suportadas
