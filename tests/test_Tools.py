@@ -1,4 +1,4 @@
-from cbers4asat.tools import rgbn_composite
+from cbers4asat.tools import rgbn_composite, grid_download
 from rasterio import open as rasterio_open
 from fixtures import rgb_assert_metadata
 from os import remove
@@ -6,6 +6,18 @@ import pytest
 from pathlib import Path
 
 FIXTURE_DIR = Path(__file__).parent.resolve() / 'data'
+
+
+class MockResponse:
+    def __init__(self):
+        self.status_code = 200
+
+    def raise_for_status(self):
+        pass
+
+    @staticmethod
+    def iter_content(chunk_size):
+        yield b"dummydata"
 
 
 class TestTools:
@@ -30,3 +42,16 @@ class TestTools:
             assert rgb_assert_metadata == raster.meta
 
         remove(f"{tmp_path.as_posix()}/RGBN_COMPOSITE_TEST.tif")
+
+    def test_grid_download(self, monkeypatch, tmp_path):
+        def mock_get(*args, **kwargs):
+            return MockResponse()
+
+        monkeypatch.setattr("requests.Session.get", mock_get)
+
+        grid_download(satellite='amazonia1', sensor='wfi', outdir=tmp_path.as_posix())
+
+        with open(f"{tmp_path.as_posix()}/grid_amazonia1_wfi_sa.zip", 'rb') as f:
+            assert f.read() == b"dummydata"
+
+        remove(f"{tmp_path.as_posix()}/grid_amazonia1_wfi_sa.zip")
