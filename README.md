@@ -51,7 +51,8 @@ print(produtos)
 ## Utilize a caixa de ferramenta para os trabalhos mais comuns
 
 ```python
-from cbers4asat.tools import rgbn_composite # Pansharpening em breve!
+# Para ver todas as ferramentas disponíveis, verifique a documentação
+from cbers4asat.tools import rgbn_composite
 import rasterio as rio
 from rasterio.plot import show
 
@@ -66,7 +67,7 @@ rgbn_composite(red='./CBERS4A_WPM22812420210704/CBERS_4A_WPM_20210704_228_124_L4
 # Plotando a imagem
 raster = rio.open("./STACK/CBERS4A_WPM22812420210704_TRUE_COLOR.tif")
 
-show(raster.read(), transform=raster.transform, with_bounds=True)
+show(raster.read(), transform=raster.transform)
 ```
 
 ## Download da biblioteca com pip

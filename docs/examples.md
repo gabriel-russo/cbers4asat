@@ -8,6 +8,7 @@
 * [Converter coleção de produtos para GeoDataFrame](#converter-colecao-de-produtos-para-geodataframe)
 * [Download de produtos no GeoDataFrame ](#download-de-produtos-no-geodataframe)
 * [Empilhamento de bandas](#empilhamento-de-bandas)
+* [Download do grid do CBERS-04A ou AMAZONIA1](#download-do-grid-do-cbers4a-ou-amazonia1)
 
 ## Buscando produtos com Bounding Box:
 
@@ -237,8 +238,24 @@ rgbn_composite(red='./CBERS4A_WPM22812420210704/CBERS_4A_WPM_20210704_228_124_L4
 
 raster = rio.open("./STACK/CBERS4A_WPM22812420210704_TRUE_COLOR.tif")
 
-show(raster.read(), transform=raster.transform, with_bounds=True)
+show(raster.read(), transform=raster.transform)
 ```
 
 ### Resultado
+
 ![true color](img/rgbn_composite_true_color.png)
+
+## Download do grid do cbers4a ou amazonia1
+
+```python
+from cbers4asat.tools import grid_download
+
+# Download do grid: CBERS-04A WFI
+grid_download(satellite='cbers4a', sensor='wfi')
+
+# Download do grid: CBERS-04A MUX
+grid_download(satellite='cbers4a', sensor='mux')
+
+# Download do grid: AMAZONIA-1 WFI
+grid_download(satellite='amazonia', sensor='wfi')
+```
