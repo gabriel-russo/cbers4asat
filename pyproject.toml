@@ -1,6 +1,6 @@
 [project]
 name = "cbers4asat"
-version = "0.6.7"
+version = "0.6.8"
 description = "Biblioteca Python para consultar o catálogo e realizar operações com dados do CBERS4A"
 authors = [
     { name = "Gabriel Russo", email = "gabrielrusso@protonmail.com" }]
@@ -30,7 +30,9 @@ dev = [
 tools = [
     "rasterio>=1.3.6",
     "numpy>=1.24.2",
-    "scikit-image>=0.20.0"
+    "scikit-image>=0.20.0",
+    "geojson>=3.0.1",
+    "geomet>=1.0.0"
 ]
 
 [build-system]
