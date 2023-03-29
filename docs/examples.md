@@ -8,7 +8,9 @@
 * [Converter coleção de produtos para GeoDataFrame](#converter-colecao-de-produtos-para-geodataframe)
 * [Download de produtos no GeoDataFrame ](#download-de-produtos-no-geodataframe)
 * [Empilhamento de bandas](#empilhamento-de-bandas)
+* [Pansharpening](#pansharpening)
 * [Download do grid do CBERS-04A ou AMAZONIA1](#download-do-grid-do-cbers4a-ou-amazonia1)
+* [Recortando raster](#recortando-raster)
 
 ## Buscando produtos com Bounding Box:
 
@@ -245,6 +247,33 @@ show(raster.read(), transform=raster.transform)
 
 ![true color](img/rgbn_composite_true_color.png)
 
+## Pansharpening
+
+```python
+from cbers4asat.tools import pansharpening
+import rasterio as rio
+from rasterio.plot import show
+
+# ATENÇÃO
+## O algoritmo do pansharpening utiliza uma grande quantidade de memória,
+## sendo proporcional ao tamanho da imagem pancromática.
+
+pansharpening(
+    panchromatic="./CBERS4A_WPM22312920210829/CBERS_4A_WPM_20210829_223_129_L4_BAND0.tif",
+    multispectral="./MULTISPECTRAL.tif",
+    filename="PANSHARP.tif",
+    outdir="./OUTPUT",
+)
+
+raster = rio.open("./OUTPUT/PANSHARP.tif")
+
+show(raster.read(), transform=raster.transform)
+```
+
+### Resultado
+
+![pansharp](img/pansharp.png)
+
 ## Download do grid do cbers4a ou amazonia1
 
 ```python
@@ -258,4 +287,27 @@ grid_download(satellite='cbers4a', sensor='mux')
 
 # Download do grid: AMAZONIA-1 WFI
 grid_download(satellite='amazonia', sensor='wfi')
+```
+
+## Recortando raster
+
+```python
+from cbers4asat.tools import clip, read_geojson
+# import geopandas as gpd # Descomente caso utilize a segunda opção
+
+# Alternativas de máscara de recorte
+
+# Primeira alternativa: Utilizar um geojson (mais fácil)
+geo = read_geojson("area_de_interesse.geojson")
+
+# Segunda alternativa: Utilizar uma geometria shapely Polygon
+# gdf = gpd.read_file("mascara.shp")
+# geo = gdf.geometry[0]
+
+clip(
+    raster="./Imagens/BAND3.tif",
+    mask=geo,
+    outdir="output",
+    filename="BAND3_CLIP.tif",
+)
 ```
