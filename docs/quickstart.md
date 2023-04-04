@@ -20,10 +20,13 @@ from datetime import date
 api = Cbers4aAPI('seu.login@email.com')
 
 # Bouding Box escolhido
-bbox = [-63.92944335937501,
-        -8.819260401678381,
-        -63.79211425781251,
-        -8.722218306198739]
+#   O bounding box é formado por 4 coordenadas: [x_min, y_min, x_max, y_max],
+#   correspondendo respectivamente a: [oeste, sul, leste, norte].
+#   Sendo essa ordem um fator importante para o funcionamento da busca
+bbox = [-63.92944335937501, # Oeste
+        -8.819260401678381, # Sul
+        -63.79211425781251, # Leste
+        -8.722218306198739] # Norte
 
 # Intervalo de data para a busca
 data_inicial = date(2021, 8, 25)
