@@ -1,6 +1,6 @@
 [project]
 name = "cbers4asat"
-version = "0.6.8"
+version = "0.6.9"
 description = "Biblioteca Python para consultar o catálogo e realizar operações com dados do CBERS4A"
 authors = [
     { name = "Gabriel Russo", email = "gabrielrusso@protonmail.com" }]

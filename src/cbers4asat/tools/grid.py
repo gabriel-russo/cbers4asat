@@ -21,11 +21,11 @@ def grid_download(
     """
     grids = {
         "cbers4a": {
-            "mux": "http://www.dgi.inpe.br/documentacao/arquivos/grid_cbers4a_mux.zip/@@download/file/grid_cbers4a_mux.zip",
-            "wfi": "http://www.dgi.inpe.br/documentacao/arquivos/grid_cbers4a_wfi.zip/@@download/file/grid_cbers4a_wfi.zip",
+            "mux": "http://www.dgi.inpe.br/documentacao/arquivos/grid_cbers4a_mux.zip",
+            "wfi": "http://www.dgi.inpe.br/documentacao/arquivos/grid_cbers4a_wfi.zip",
         },
         "amazonia1": {
-            "wfi": "http://www.dgi.inpe.br/documentacao/arquivos/grid_amazonia1_wfi_sa.zip/@@download/file/grid_amazonia1_wfi_sa.zip"
+            "wfi": "http://www.dgi.inpe.br/documentacao/arquivos/grid_amazonia1_wfi_sa.zip"
         },
     }
 
