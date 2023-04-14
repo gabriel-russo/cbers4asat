@@ -11,41 +11,77 @@ Agradecemos antecipadamente por suas contribuições!
 - [Diretrizes de Estilo](#diretrizes-de-estilo)
 - [Fluxo de Trabalho](#fluxo-de-trabalho)
 - [O que esperamos dos contribuidores?](#o-que-esperamos-dos-contribuidores)
-- [Como reportar problemas?](#como-reportar-problemas)
 - [Como enviar um feedback?](#como-enviar-um-feedback)
 
 
 ## Como Contribuir
 
-Existem várias maneiras pelas quais você pode contribuir para o CBERS4ASAT:
+Existem várias maneiras pelas quais você pode contribuir para o `cbers4asat`:
 
-- Reportando bugs: Se você encontrar algum bug em nosso projeto, informe-nos através da abertura de
-  uma [issue](https://github.com/gabriel-russo/cbers4asat/issues) em nosso repositório no GitHub.
+- **Reportando bugs**: Caso encontre algum problema no código ou na documentação, por favor, crie uma
+[issue](https://github.com/gabriel-russo/cbers4asat/issues) descrevendo o problema de forma clara e 
+objetiva. Certifique-se de incluir todas as informações relevantes, como mensagens de erro, passos para reproduzir o problema, etc.
 
-- Adicionando recursos: Se você tem uma ideia para um novo recurso ou funcionalidade, sinta-se à vontade para abrir
+- **Requisitando recursos**: Se você tem uma ideia para um novo recurso ou funcionalidade, sinta-se à vontade para abrir
   uma [nova discussão](https://github.com/gabriel-russo/cbers4asat/discussions/categories/ideas) e compartilhar sua
   ideia conosco.
 
-- Resolvendo issues: Se você é um desenvolvedor, pode contribuir resolvendo issues já existentes. Basta escolher uma
+- **Resolvendo issues**: Se você é um desenvolvedor, pode contribuir resolvendo issues já existentes. Basta escolher uma
   issue que esteja aberta.
 
-- Adicionando documentação: A documentação é uma parte importante de qualquer projeto de software. Se você é bom em
+- **Adicionando documentação**: A documentação é uma parte importante de qualquer projeto de software. Se você é bom em
   escrever documentação, sinta-se à vontade para contribuir com nossos arquivos de documentação.
 
-- Adicionando testes: Testes são extremamente importantes para garantir a qualidade do código. Se você é um
+- **Adicionando testes**: Testes são extremamente importantes para garantir a qualidade do código. Se você é um
   desenvolvedor experiente em testes, contribua adicionando mais testes ao projeto.
 
-- Enviando Pull Requests: Se você fez alguma alteração no código e gostaria de compartilhá-la com a comunidade, envie um
+- **Enviando Pull Requests**: Se você fez alguma alteração no código e gostaria de compartilhá-la com a comunidade, envie um
   Pull Request (PR). Certifique-se de que seu código siga as diretrizes de contribuição deste documento.
 
 ## Diretrizes de Estilo
 
-Nós seguimos as diretrizes de estilo de código definidas pelo [Black code formatter](https://github.com/psf/black),
-juntamente
-com a ferramenta de análise estática [flake8](https://github.com/PyCQA/flake8).
+### Linter e formatador de código 
+Nós seguimos as diretrizes de estilo de formatação de código definidas pelo [Black code formatter](https://github.com/psf/black),
+juntamente com a ferramenta de análise estática (linter) [flake8](https://github.com/PyCQA/flake8).
 
-Essas ferramentas garantem que todo o código do projeto siga um padrão de estilo consistente, o que facilita a leitura e
+Essas ferramentas garantem que todo o código do projeto siga um padrão de estilo consistente, facilitando a leitura e
 a manutenção do código.
+
+### Estilos de código
+
+- **Imports**: Os imports devem ser específicos, ou seja, devem ser feitos apenas para as funções que serão utilizadas.
+  Por exemplo, ao invés de fazer:
+
+  ```python
+  import numpy
+  ```
+
+  Faça:
+  ```python
+  from numpy import ndarray
+  ```
+
+- **funções**: 
+  - O nome das funções devem ser escritas utilizando o padrão [snake_case](https://en.wikipedia.org/wiki/Snake_case)
+  - Os parâmetros das funções devem possuir tipos definidos e, se for necessário, valor padrão. Por exemplo:
+    ```python
+    def minha_funcao(x: int, y: float, z: str = "default"):
+        pass
+    ```
+    Caso o parâmetro possua um tipo muito específico, deve utilizar os tipos da biblioteca [typing](https://docs.python.org/3/library/typing.html). 
+    Por exemplo:
+    ```python
+    from typing import List
+    from numpy import ndarray
+
+    def minha_funcao(x: List[ndarray]):
+        pass
+    ```
+    _Em caso de dúvidas, faça uma breve leitura em códigos já existentes no projeto._    
+
+- **docstrings**: As docstrings devem ser escritas utilizando o padrão [Google Style](https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html).
+
+[Siga a filosofia pythonista o máximo possível.](https://peps.python.org/pep-0020/)
 
 **Certifique-se de que seu código siga essas diretrizes antes de enviar um Pull Request.**
 
@@ -126,12 +162,6 @@ dessa forma não irá poluir o histórico de commits do projeto com commits de c
 Esperamos que os contribuidores sejam atenciosos, respeitosos e tolerantes com as opiniões de outros colaboradores. Além
 disso, os contribuidores devem estar abertos para discussões e críticas construtivas, e devem se esforçar para melhorar a
 qualidade do código e da documentação do projeto.
-
-## Como reportar problemas?
-
-Caso encontre algum problema no código ou na documentação, por favor, crie uma issue no repositório, descrevendo o 
-problema de forma clara e objetiva. Certifique-se de incluir todas as informações relevantes, como mensagens de erro, 
-passos para reproduzir o problema, etc.
 
 ## Como enviar um feedback?
 
