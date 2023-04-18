@@ -7,12 +7,18 @@ Agradecemos antecipadamente por suas contribuições!
 
 ## Sumário
 
+- [Por quê contribuir?](#Por-quê-contribuir?)
 - [Como Contribuir](#como-contribuir)
 - [Diretrizes de Estilo](#diretrizes-de-estilo)
 - [Fluxo de Trabalho](#fluxo-de-trabalho)
 - [O que esperamos dos contribuidores?](#o-que-esperamos-dos-contribuidores)
 - [Como enviar um feedback?](#como-enviar-um-feedback)
 
+## Por quê contribuir?
+
+Este projeto pode ampliar o acesso e o uso de dados de satélites nacionais. Estes dados são de suma importância para o monitoramento do território brasileiro e de outras partes do mundo. Existe uma serie de aplicações na área de observação da terra e que pode contribuir para o monitoramento do desflorestamento, qualidade da água, agricultura, planejamento urbano, etc.
+Contribuir com este código impulsiona a operacionalização dos dados. Como exemplo da necessidade de operacionalização, este código vou desenvolvido para operacionalizar dados fusionados do sensor WPM a bordo do satélite CBERS4A para identificação de presença antrópica em áreas remotas. Processamento de correção atmosférica também é um exemplo de contribuição importante porque é considerado uma etapa fundamental na detecção de parâmetros biofísicos da superfície terrestre. 
+Atualmente não existe um sistema capaz de automatizar etapas do processamento das imagens dos satélites CBERS4A e Amazônia e esta é a oportunidade.
 
 ## Como Contribuir
 

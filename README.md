@@ -2,14 +2,14 @@
 
 ## Descrição
 
-Biblioteca Python para consultar o catálogo e realizar operações com dados do CBERS4A e AMAZONIA1.
+Biblioteca Python para realizar a busca e processamento de imagens dos satélites CBERS4A e AMAZONIA-1.
 
 A biblioteca `cbers4asat` surgiu da necessidade de automatizar a busca e manipulação de imagens do satélite
-sino-brasileiro CBERS-04A utilizando linguagens de programação.
+sino-brasileiro CBERS-04A utilizando linguagens de programação. Posteriormente foi incluido a automação do satélite AMAZONIA-1.
 
 O design do projeto foi inspirado no [sentinelsat](https://github.com/sentinelsat/sentinelsat), onde é possível de forma
 intuitiva, pesquisar por imagens e realizar o download com poucas linhas de código, além de poder ser integrado com
-outras bibiliotecas como o geopandas.
+outras bibiliotecas como o geopandas. 
 
 ---
 [![Latest Version](https://img.shields.io/pypi/v/cbers4asat?style=plastic)](https://pypi.python.org/pypi/cbers4asat/)
@@ -36,7 +36,8 @@ api = Cbers4aAPI('email@mail.com')
 # Área de interesse (bbox, path row ou polígono)
 path_row = (229, 124)
 
-# Buscando metadados
+# Buscando metadados. A localização é feita a partir do path_row (órbita/ponto). 
+# Consulte a órbita/ponto: http://www.dgi.inpe.br/documentacao/grades
 produtos = api.query(location=path_row,
                      initial_date=date(2021, 6, 1),
                      end_date=date(2021, 7, 1),
