@@ -1,11 +1,11 @@
 [project]
 name = "cbers4asat"
-version = "0.6.9"
-description = "Biblioteca Python para consultar o catálogo e realizar operações com dados do CBERS4A"
+version = "0.7.0"
+description = "Biblioteca Python para realizar a busca e processamento de imagens dos satélites CBERS-04A e AMAZONIA-1"
 authors = [
     { name = "Gabriel Russo", email = "gabrielrusso@protonmail.com" }]
 license = { file = "LICENSE" }
-keywords = ["cbers", "cbers4a", "remote sensing", "geoprocessing"]
+keywords = ["cbers", "cbers4a", "cbers-04a", "amazonia-1", "remote sensing", "geoprocessing"]
 readme = "README.md"
 requires-python = ">=3.8"
 classifiers = [
@@ -72,6 +72,6 @@ serve = "mkdocs serve"
 build = "mkdocs build --clean --strict"
 
 [project.urls]
-"Homepage" = "https://github.com/gabriel-russo/cbers4asat"
+"Homepage" = "https://cbers4asat.readthedocs.io/pt_BR/latest"
 "Bug Tracker" = "https://github.com/gabriel-russo/cbers4asat/issues"
 "Repository" = "https://github.com/gabriel-russo/cbers4asat.git"

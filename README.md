@@ -1,4 +1,4 @@
-# Cbers4asat
+# cbers4asat
 
 ## Descrição
 
@@ -8,8 +8,12 @@ A biblioteca `cbers4asat` surgiu da necessidade de automatizar a busca e manipul
 sino-brasileiro CBERS-04A utilizando linguagens de programação. Posteriormente foi incluido a automação do satélite AMAZONIA-1.
 
 O design do projeto foi inspirado no [sentinelsat](https://github.com/sentinelsat/sentinelsat), onde é possível de forma
-intuitiva, pesquisar por imagens e realizar o download com poucas linhas de código, além de poder ser integrado com
-outras bibiliotecas como o geopandas. 
+intuitiva realizar diversas ações, como: 
+- Pesquisar por imagens. 
+- Baixar as imagens pesquisadas.
+- Processar as imagens baixadas.
+
+Veja todos os [exemplos de uso](https://cbers4asat.readthedocs.io/pt_BR/latest/examples/) na documentação.
 
 ---
 [![Latest Version](https://img.shields.io/pypi/v/cbers4asat?style=plastic)](https://pypi.python.org/pypi/cbers4asat/)
@@ -33,10 +37,10 @@ from datetime import date
 # Inicializando a biblioteca
 api = Cbers4aAPI('email@mail.com')
 
-# Área de interesse (bbox, path row ou polígono)
+# Área de interesse. Pode ser: bouding box, path row ou polygon.
 path_row = (229, 124)
 
-# Buscando metadados. A localização é feita a partir do path_row (órbita/ponto). 
+# Buscando metadados. Este exemplo utiliza o path row (órbita/ponto). 
 # Consulte a órbita/ponto: http://www.dgi.inpe.br/documentacao/grades
 produtos = api.query(location=path_row,
                      initial_date=date(2021, 6, 1),
@@ -73,11 +77,15 @@ show(raster.read(), transform=raster.transform)
 
 ## Download da biblioteca com pip
 
-`pip install cbers4asat`
+```
+pip install cbers4asat
+```
 
 Instalação com a caixa de ferramentas
 
-`pip install cbers4asat[tools]`
+```
+pip install "cbers4asat[tools]"
+```
 
 ## Documentação
 
@@ -88,7 +96,7 @@ Você pode ler a documentação da biblioteca no link abaixo
 ## Contribuição
 
 Convido qualquer pessoa a participar contribuindo com código, relatando bugs,
-escrevendo documentação, tutoriais e discutindo o futuro deste projeto.
+escrevendo documentação, criando tutoriais e discutindo o futuro deste projeto.
 
 Para mais informações de como contribuir ao projeto,
 leia [ao manual de contribuição](https://github.com/gabriel-russo/cbers4asat/blob/master/CONTRIBUTING.md)
@@ -100,7 +108,7 @@ no [painel de projetos](https://github.com/gabriel-russo/cbers4asat/projects)
 
 # Licença
 
-Copyright (c) 2022 Gabriel Russo
+Copyright (c) 2023 Gabriel Russo
 
 Copyright (c) 2020 Sandro Klippel
 
