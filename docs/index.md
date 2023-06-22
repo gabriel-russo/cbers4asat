@@ -29,8 +29,12 @@ API [SpatioTemporal Asset Catalogs](https://stacspec.org/en/).
 
 ## TCC
 
-Esse projeto foi meu objeto de estudo do Trabalho de Conclusão de Curso (TCC) do curso de Ciência da Computação, você
+Esse projeto foi meu objeto de estudo do Trabalho de Conclusão de Curso (TCC) no curso de Bacharelado em Ciência da Computação, você
 pode visualizar o PDF neste Link:
+
+[Repositório Institucional da Universidade Federal de Rondônia](https://ri.unir.br/jspui/handle/123456789/4345)
+
+Backup:
 
 [TCC_Gabriel_Russo-completo.pdf](https://github.com/gabriel-russo/cbers4asat/tree/master/docs/research/TCC_Gabriel_Russo-completo.pdf)
 

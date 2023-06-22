@@ -93,6 +93,13 @@ Você pode ler a documentação da biblioteca no link abaixo
 
 > https://cbers4asat.readthedocs.io/
 
+## TCC
+
+Esse projeto foi meu objeto de estudo do Trabalho de Conclusão de Curso (TCC) no curso de Bacharelado em Ciência da Computação, você
+pode visualizar o PDF neste Link:
+
+[Repositório Institucional da Universidade Federal de Rondônia](https://ri.unir.br/jspui/handle/123456789/4345)
+
 ## Contribuição
 
 Convido qualquer pessoa a participar contribuindo com código, relatando bugs,
