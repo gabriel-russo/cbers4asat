@@ -1,5 +1,6 @@
 # Exemplos
 
+* [Projetos com o cbers4asat](#projetos-que-utilizam-a-biblioteca-cbers4asat)
 * [Buscando produtos com bounding box](#buscando-produtos-com-bounding-box)
 * [Buscando produtos com órbita e ponto](#buscando-produtos-com-orbita-e-ponto)
 * [Buscando produtos com geometria](#buscando-produtos-com-geometria)
@@ -10,7 +11,14 @@
 * [Empilhamento de bandas](#empilhamento-de-bandas)
 * [Pansharpening](#pansharpening)
 * [Download do grid do CBERS-04A ou AMAZONIA1](#download-do-grid-do-cbers4a-ou-amazonia1)
-* [Recortando raster](#recortando-raster)
+* [Recortando raster com GeoJSON](#recortando-raster-a-partir-de-uma-mascara-geojson)
+* [Recortando raster com GeoDataFrame](#recortando-raster-a-partir-de-uma-mascara-geodataframe)
+
+## Projetos que utilizam a biblioteca `cbers4asat`:
+> Caso você tenha um projeto que utiliza a biblioteca, me envie um email para adicioná-lo aqui. gabrielrusso@protonmail.com
+
+### 1 - Mosaico de imagens do Estado de Rondônia automatizado
+ - [gabriel-russo/mosaico-cbers4a](https://github.com/gabriel-russo/mosaico-cbers4a)
 
 ## Buscando produtos com Bounding Box:
 
@@ -289,25 +297,35 @@ grid_download(satellite='cbers4a', sensor='mux')
 grid_download(satellite='amazonia', sensor='wfi')
 ```
 
-## Recortando raster
+## Recortando raster a partir de uma máscara - GeoJSON
 
 ```python
 from cbers4asat.tools import clip, read_geojson
-# import geopandas as gpd # Descomente caso utilize a segunda opção
 
-# Alternativas de máscara de recorte
-
-# Primeira alternativa: Utilizar um geojson (mais fácil)
 geo = read_geojson("area_de_interesse.geojson")
 
-# Segunda alternativa: Utilizar uma geometria shapely Polygon
-# gdf = gpd.read_file("mascara.shp")
-# geo = gdf.geometry[0]
+clip(
+    raster="./downloads/BANDA_3.tif",
+    mask=geo,
+    outdir="./recortados",
+    filename="BANDA_3_CLIP.tif",
+)
+```
+
+## Recortando raster a partir de uma máscara - GeoDataFrame
+
+```python
+from cbers4asat.tools import clip
+import geopandas as gpd
+
+gdf = gpd.read_file("area_de_interesse.shp")
+
+geo = gdf.geometry[0] # Pega a primeira geometria do GeoDataFrame
 
 clip(
-    raster="./Imagens/BAND3.tif",
+    raster="./downloads/BANDA_3.tif",
     mask=geo,
-    outdir="output",
-    filename="BAND3_CLIP.tif",
+    outdir="./recortados",
+    filename="BANDA_3_CLIP.tif",
 )
 ```

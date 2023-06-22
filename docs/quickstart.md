@@ -7,7 +7,7 @@ imagens do CBERS-04A e AMAZONIA-1.
 
 Dessa forma, cria-se inicialmente uma instância dessa classe e utiliza-se os métodos do objeto.
 
-**É necessário possuir um cadastro na [plataforma](http://www2.dgi.inpe.br/catalogo/explore)**
+**É necessário possuir um cadastro na [plataforma Explorer do DGI-INPE](http://www2.dgi.inpe.br/catalogo/explore)**
 
 ```python
 # Importar biblioteca do cbers4asat
@@ -57,7 +57,7 @@ gdf = api.to_geodataframe(produtos, 'EPSG:4674')
 
 ## Autenticação
 
-Para baixar imagens, é necessário autenticar-se no `cbers4asat` com o mesmo login da plataforma da DIVISÃO DE
+Para baixar imagens, é necessário autenticar-se no `cbers4asat` com o mesmo login da plataforma Explorer da DIVISÃO DE
 GERAÇÃO DE IMAGENS - INPE.
 
 Caso não possua login, realize o cadastro no site:

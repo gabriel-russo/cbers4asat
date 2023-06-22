@@ -2,7 +2,7 @@
 
 ## Descrição
 
-Biblioteca Python para realizar a busca e processamento de imagens dos satélites CBERS4A e AMAZONIA-1.
+Biblioteca Python para realizar a busca e processamento de imagens dos satélites CBERS-04A e AMAZONIA-1.
 
 A biblioteca `cbers4asat` surgiu da necessidade de automatizar a busca e manipulação de imagens do satélite
 sino-brasileiro CBERS-04A utilizando linguagens de programação. Posteriormente foi incluido a automação do satélite AMAZONIA-1.
