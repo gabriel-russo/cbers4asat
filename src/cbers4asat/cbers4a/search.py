@@ -10,7 +10,7 @@ class Search(object):
     """Simple class to search INPE STAC Catalog"""
 
     # INPE STAC Catalog
-    base_url = "http://www2.dgi.inpe.br/inpe-stac"
+    base_url = "http://www.dgi.inpe.br/lgi-stac"
     collection_endpoint = "/collections"
     search_endpoint = "/search"
 
@@ -44,12 +44,12 @@ class Search(object):
             features = []
             for id_ in self.search_keys["ids"]:
                 r = self.session.get(
-                    self.base_url + self.collection_endpoint + "/X/items/" + id_
+                    f'{self.base_url}{self.collection_endpoint}/{self.search_keys["collection"]}/items/{id_}'
                 )
                 r.raise_for_status()
                 if r.status_code == 200:
                     feat = r.json()
-                    if feat["type"] == "Feature":
+                    if feat.get("type") == "Feature":
                         features.append(feat)
             return ItemCollection({"type": "FeatureCollection", "features": features})
         else:
@@ -126,7 +126,10 @@ class Search(object):
         """
         docstring
         """
-        self.update(collections=collections)
+        if isinstance(collections, str):
+            self.update(collection=collections)
+        else:
+            self.update(collections=collections)
 
     def ids(self, ids):
         """

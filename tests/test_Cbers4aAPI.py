@@ -185,7 +185,7 @@ class TestCbers4aAPI:
 
         monkeypatch.setattr("requests.Session.get", mock_get)
 
-        result = self.api.query_by_id("ABC123")
+        result = self.api.query_by_id(scene_id="ABC123", collection="y")
 
         assert self.expected_result == result
 
@@ -195,7 +195,7 @@ class TestCbers4aAPI:
 
         monkeypatch.setattr("requests.Session.get", mock_get)
 
-        result = self.api.query_by_id(["ABC123"])
+        result = self.api.query_by_id(scene_id=["ABC123"], collection="y")
 
         assert self.expected_result == result
 

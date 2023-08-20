@@ -93,22 +93,30 @@ class Cbers4aAPI:
         return result.featurescollection
 
     @staticmethod
-    def query_by_id(id_: Union[str, List[str]]):
+    def query_by_id(scene_id: Union[str, List[str]], collection: str = None):
         """
         Search a product by id
 
         Args:
-            id_: One or more scene's id
+            scene_id: One or more scene's id
+            collection: Collection's name
         Returns:
             dict: Dict with GeoJSON-like format
         """
         search = Search()
 
+        if not scene_id:
+            raise Exception("Especify an id")
+        elif not collection:
+            raise Exception("Especify a collection")
+
         # search() method only works with a list of ids.
-        if type(id_) is not list:
-            search.ids([id_])
+        if type(scene_id) is not list:
+            search.ids([scene_id])
         else:
-            search.ids(id_)
+            search.ids(scene_id)
+
+        search.collections(collection)
 
         result = search()
         return result.featurescollection
@@ -180,7 +188,7 @@ class Cbers4aAPI:
                     mkdir(new_path)
                     outdir = new_path
 
-                products_query = self.query_by_id(str(index))
+                products_query = self.query_by_id(str(index), row.collection)
                 products_query = ItemCollection(products_query).items()
                 for product in products_query:
                     for band in bands:
@@ -249,6 +257,18 @@ class Cbers4aAPI:
         Returns:
             GeoDataFrame
         """
-        return GeoDataFrame.from_features(products, crs=crs).set_index(
-            json_normalize(products["features"])["id"].values
-        )
+        items = [feat for feat in ItemCollection(products).items()]
+
+        for item in items:
+            item_metadata = {}
+            item_metadata.update(id=item.id)
+            item_metadata.update(bbox=item.bbox)
+            item_metadata.update(collection=item.collection)
+
+            for index, feature in enumerate(products.get("features")):
+                if feature["id"] == item.id:
+                    products.get("features")[index].get("properties").update(
+                        **item_metadata
+                    )
+
+        return GeoDataFrame.from_features(products, crs=crs).set_index("id")
