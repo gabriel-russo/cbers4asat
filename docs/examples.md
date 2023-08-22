@@ -121,14 +121,20 @@ from cbers4asat import Cbers4aAPI
 
 api = Cbers4aAPI('meu@email.com')
 
+# Nota: após a versão 0.7 você deve especificar a coleção que a imagem pertence,
+#   segue a mesma lógica da função query
+
+# Nota2: Não é possível misturar coleções neste método assim como o query
+
 # Buscando pelo ID de uma cena
-produto = api.query_by_id('CBERS4A_WPM22912420210830')
+produto = api.query_by_id(scene_id='CBERS4A_WPM22912420210830', collection="CBERS4A_WPM_L4_DN")
+
 
 print(produto)
 
 # Para mais de um produto:
 
-produtos = api.query_by_id(['CBERS4A_WPM22912420210830', 'AMAZONIA1_WFI03901620210911CB11'])
+produtos = api.query_by_id(scene_id=['CBERS4A_WPM22912420210830', 'CBERS4A_WPM22912420220706'], collection="CBERS4A_WPM_L4_DN")
 
 print(produtos)
 
