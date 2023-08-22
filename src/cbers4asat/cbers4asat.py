@@ -264,6 +264,8 @@ class Cbers4aAPI:
             item_metadata.update(id=item.id)
             item_metadata.update(bbox=item.bbox)
             item_metadata.update(collection=item.collection)
+            item_metadata.update(thumbnail=item.thumbnail)
+            item_metadata.update(urls=[{asset: item.url(asset)} for asset in item.assets])
 
             for index, feature in enumerate(products.get("features")):
                 if feature["id"] == item.id:
