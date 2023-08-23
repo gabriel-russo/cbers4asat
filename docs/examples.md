@@ -28,7 +28,7 @@ from cbers4asat import Cbers4aAPI
 from datetime import date
 
 # (Requisito apenas para download) 
-# Login utilizado no http://www2.dgi.inpe.br/catalogo/explore
+# Login utilizado no http://www.dgi.inpe.br/catalogo/explore
 # Pode ser adicionado depois com o setter: api.user('meu@email.com')
 api = Cbers4aAPI('seu.login@email.com')
 

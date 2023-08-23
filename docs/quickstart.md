@@ -7,7 +7,7 @@ imagens do CBERS-04A e AMAZONIA-1.
 
 Dessa forma, cria-se inicialmente uma instância dessa classe e utiliza-se os métodos do objeto.
 
-**É necessário possuir um cadastro na [plataforma Explorer do DGI-INPE](http://www2.dgi.inpe.br/catalogo/explore)**
+**É necessário possuir um cadastro na [plataforma Explorer do DGI-INPE](http://www.dgi.inpe.br/catalogo/explore)**
 
 ```python
 # Importar biblioteca do cbers4asat
@@ -62,12 +62,12 @@ GERAÇÃO DE IMAGENS - INPE.
 
 Caso não possua login, realize o cadastro no site:
 
-[http://www2.dgi.inpe.br/catalogo/explore](http://www2.dgi.inpe.br/catalogo/explore)
+[http://www.dgi.inpe.br/catalogo/explore](http://www2.dgi.inpe.br/catalogo/explore)
 
 ## Coleções de imagens
 
 As coleções disponíveis para uso no método `query` pode ser encontrado
-no [mesmo site que é feito a autenticação](http://www2.dgi.inpe.br/catalogo/explore). Porém você pode utilizar a colinha
+no [mesmo site que é feito a autenticação](http://www.dgi.inpe.br/catalogo/explore). Porém você pode utilizar a colinha
 abaixo:
 
 ![Image Collections](img/collections.png)
