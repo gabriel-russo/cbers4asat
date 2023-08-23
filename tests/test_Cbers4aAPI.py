@@ -39,7 +39,8 @@ class MockStacFeatureCollectionResponse:
                     },
                     "bbox": [-48.3106, -16.4178, -47.2492, -15.3637],
                     "properties": {"x": "XYZ"},
-                    "assets": {"blue": {"href": "http://test.dev/image.tif"}},
+                    "assets": {"blue": {"href": "http://test.dev/image.tif"},
+                               "thumbnail": {"href": "http://test.dev/thumbnail.png"}},
                     "links": [{"x": "y"}],
                 }
             ],
@@ -77,7 +78,8 @@ class MockStacFeatureResponse:
             },
             "bbox": [-48.3106, -16.4178, -47.2492, -15.3637],
             "properties": {"x": "XYZ"},
-            "assets": {"blue": {"href": "http://test.dev/image.tif"}},
+            "assets": {"blue": {"href": "http://test.dev/image.tif"},
+                       "thumbnail": {"href": "http://test.dev/thumbnail.png"}},
             "links": [{"x": "y"}],
         }
 
@@ -105,7 +107,8 @@ class TestCbers4aAPI:
                 },
                 "bbox": [-48.3106, -16.4178, -47.2492, -15.3637],
                 "properties": {"x": "XYZ"},
-                "assets": {"blue": {"href": "http://test.dev/image.tif"}},
+                "assets": {"blue": {"href": "http://test.dev/image.tif"},
+                           "thumbnail": {"href": "http://test.dev/thumbnail.png"}},
             }
         ],
     }

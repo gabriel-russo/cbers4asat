@@ -7,7 +7,6 @@ from typing import List, overload, Dict, Union, Tuple
 from os.path import isdir, join
 from os import getcwd, cpu_count, mkdir
 from geopandas import GeoDataFrame
-from pandas import json_normalize
 from shapely.geometry import Polygon
 
 
@@ -265,7 +264,9 @@ class Cbers4aAPI:
             item_metadata.update(bbox=item.bbox)
             item_metadata.update(collection=item.collection)
             item_metadata.update(thumbnail=item.thumbnail)
-            item_metadata.update(urls=[{asset: item.url(asset)} for asset in item.assets])
+            item_metadata.update(
+                urls=[{asset: item.url(asset)} for asset in item.assets]
+            )
 
             for index, feature in enumerate(products.get("features")):
                 if feature["id"] == item.id:
