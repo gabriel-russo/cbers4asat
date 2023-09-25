@@ -2,10 +2,10 @@ use core::str::FromStr;
 use geo::algorithm::bounding_rect::BoundingRect;
 use geo::Polygon;
 use geojson::{FeatureCollection, GeoJson};
-use stac_query_builder::StacQueryBuilder;
+use stac_query::StacQuery;
 use std::process;
 
-pub mod stac_query_builder;
+pub mod stac_query;
 
 #[derive(Debug)]
 pub struct Cbers4aAPI {
@@ -16,21 +16,34 @@ impl Cbers4aAPI {
     pub fn query(
         &self,
         location: &Polygon,
-        initial_date: &String,
-        end_date: &String,
-        cloud: &u8,
-        limit: &u16,
-        collection: &String,
+        collection: Vec<String>,
+        initial_date: Option<String>,
+        end_date: Option<String>,
+        cloud: Option<u8>,
+        limit: Option<u16>,
     ) -> FeatureCollection {
         let (minx, miny) = location.bounding_rect().unwrap().min().x_y();
         let (maxx, maxy) = location.bounding_rect().unwrap().max().x_y();
 
-        let mut stac_request = StacQueryBuilder::new();
-        stac_request.set_bbox([minx, miny, maxx, maxy]);
-        stac_request.set_datetime(initial_date, end_date);
-        stac_request.set_cloud_cover(cloud);
-        stac_request.set_limit(*limit);
-        stac_request.set_collections(collection);
+        let mut stac_request = StacQuery::new([minx, miny, maxx, maxy], collection);
+
+        if initial_date.is_some() {
+            stac_request.with_initial_date(initial_date.unwrap());
+        };
+
+        if end_date.is_some() {
+            stac_request.with_end_date(end_date.unwrap());
+        }
+
+        if cloud.is_some() {
+            stac_request.with_cloud_cover(cloud.unwrap());
+        }
+
+        if limit.is_some() {
+            stac_request.with_limit(limit.unwrap());
+        }
+
+        let stac_request = stac_request.build();
 
         let client = reqwest::blocking::Client::new();
 
@@ -41,6 +54,14 @@ impl Cbers4aAPI {
 
         let res_geojson: GeoJson = match res {
             Ok(v) => {
+                if v.status().is_server_error() {
+                    eprintln!("Server Error, try again later. Status: {}", v.status());
+                    process::exit(1);
+                } else if v.status().is_client_error() {
+                    eprintln!("Client Error. Status: {}", v.status());
+                    process::exit(1);
+                }
+
                 let txt = &v.text().unwrap();
                 GeoJson::from_str(txt).unwrap()
             }

@@ -10,40 +10,39 @@ use std::process;
 pub mod cbers4asat;
 
 #[derive(Parser, Debug)]
-#[command(
-    author = "Gabriel Russo",
-    version,
-    about = "Command line interface to query data from CBERS-04A catalog",
-    long_about = None
-)]
+#[command(author, version, about, long_about)]
 struct Args {
-    /// email registered in inpe explore
-    #[arg(short, long)]
+    /// E-mail registered in dgi INPE explore (required)
+    #[arg(short, long, required = true)]
     user: String,
 
-    /// Search area geometry as GeoJSON file
+    /// Search area geometry as GeoJSON file (required)
     #[arg(short, long, value_name = "FILE")]
     geometry: PathBuf,
 
-    /// Collection name
-    #[arg(short = None, long)]
-    collection: String,
+    /// Collection(s) name(s) (Optional) (Default: All collections)
+    #[arg(long, required = true, num_args = 1..=16)]
+    collection: Vec<String>,
 
-    /// Start date of the query in the format YYYY-MM-DD
-    #[arg(short, long)]
-    start: String,
+    /// Start date of the query in the format YYYY-MM-DD (Optional) (Default: TODAY - 1 WEEK)
+    #[arg(short, long, default_value = None , required = false)]
+    start: Option<String>,
 
-    /// End date of the query in the format YYYY-MM-DD
-    #[arg(short, long)]
-    end: String,
+    /// End date of the query in the format YYYY-MM-DD (Optional) (Default: TODAY)
+    #[arg(short, long, default_value = None , required = false)]
+    end: Option<String>,
 
-    /// Maximum cloud cover in percent.
-    #[arg(short, long)]
-    cloud: u8,
+    /// Maximum cloud cover in percent. (Optional) (Default: 100)
+    #[arg(short, long, default_value = None , required = false)]
+    cloud: Option<u8>,
 
-    /// Maximum number of results to return. Defaults to 10.
-    #[arg(short, long)]
-    limit: u16,
+    /// Maximum number of results to return. (Optional) (Default: 25)
+    #[arg(short, long, default_value = None , required = false)]
+    limit: Option<u16>,
+
+    /// Search scene by id  (Optional) (This argument must be used alone)
+    #[arg(short, long, exclusive = true, required = false)]
+    id: Option<String>,
 }
 
 fn main() {
@@ -84,11 +83,11 @@ fn main() {
 
         let res_geojson = api.query(
             &geom,
-            &args.start,
-            &args.end,
-            &args.cloud,
-            &args.limit,
-            &args.collection,
+            args.collection.clone(),
+            args.start.clone(),
+            args.end.clone(),
+            args.cloud,
+            args.limit,
         );
 
         for feat in res_geojson {
