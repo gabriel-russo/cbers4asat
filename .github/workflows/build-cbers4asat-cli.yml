@@ -1,0 +1,58 @@
+name: Build and Release CLI
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - cbers4asat-cli-v*
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  cli-linux-build:
+    name: Build LINUX binary
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./cli
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build linux binaries
+        run: cargo build --release
+      - name: Shipping linux binary
+        run: |
+          mkdir dist/
+          tar -czvf dist/cbers4a-cli-linux.tar.gz --directory=target/release/ cbers4asat
+      - name: Upload binaries
+        uses: svenstaro/upload-release-action@2.3.0
+        with:
+          file: cli/dist/cbers4a-cli-linux.tar.gz
+          repo_token: ${{ secrets.GH_TOKEN }}
+          tag: ${{ github.ref }}
+          asset_name: cbers4a-cli-linux.tar.gz
+  cli-windows-build:
+    name: Build WINDOWS binary
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./cli
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install build dependencies
+        run: cargo install cross --git https://github.com/cross-rs/cross
+      - name: Prepare build directory
+        run: cargo clean
+      - name: Build windows binary
+        run: cross build --release --target x86_64-pc-windows-gnu
+      - name: Shipping windows binary
+        run: |
+          mkdir dist/
+          mv target/x86_64-pc-windows-gnu/release/cbers4asat.exe dist/
+      - name: Upload binaries
+        uses: svenstaro/upload-release-action@2.3.0
+        with:
+          file: cli/dist/cbers4asat.exe
+          repo_token: ${{ secrets.GH_TOKEN }}
+          tag: ${{ github.ref }}
+          asset_name: cbers4asat.exe
