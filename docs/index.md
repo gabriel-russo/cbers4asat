@@ -8,6 +8,7 @@ Biblioteca Python para realizar a busca e processamento de imagens dos satélite
 * [Guia de usuário](quickstart.md)
 * [Documentação](api_reference.md)
 * [Exemplos básicos](examples.md)
+* [Interface de Linha de Comando (CLI)](cli.md)
 
 ## Descrição do projeto
 

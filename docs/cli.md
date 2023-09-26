@@ -1,5 +1,11 @@
 # CLI
 
+Você pode utilizar a [Interface de Linha de Comando](https://www.alura.com.br/artigos/cli-interface-linha-comandos) do `cbers4asat` para
+consumir o catálogo de imagens do CBERS-04A e AMAZONIA-1.
+
+É uma maneira mais fácil e rápida de consultar e baixar cenas no catálogo sem a necessidade de escrever código em Python.
+
+
 ## Download
 
 Vá até as releases e procure pelo versão mais recente de `cbers4asat-cli` e baixe o executável que mais se adeque ao seu sistema operacional.
@@ -17,7 +23,8 @@ https://github.com/gabriel-russo/cbers4asat/releases
 | -e         | --end        | TEXTO   | Não         | Data final utilizando o formato YYYY-MM-DD (Padrão: HOJE)                                                                                        |
 | -c         | --cloud      | INTEIRO | Não         | Quantidade de cobertura de núvens máximo na imagem  (Padrão: 100)                                                                                |
 | -l         | --limit      | INTEIRO | Não         | Quantidade de cenas limite retornadas por busca  (Padrão: 25)                                                                                    |
-| -i         | --id         | TEXTO   |             | **NÃO DISPONÍVEL**                                                                                                                               |
+| -i         | --id         | TEXTO   | Não         | **NÃO DISPONÍVEL**                                                                                                                               |
+| -d         | --download   |         |             | **NÃO DISPONÍVEL**                                                                                                                               |
 | -h         | --help       |         |             | Mostra texto de ajuda para utilização                                                                                                            |
 | -v         | --version    |         |             | Mostra o número da versão                                                                                                                        |
 
@@ -67,3 +74,9 @@ Product AMAZONIA1_WFI03901720230728CB10 - Date: "2023-07-28T15:03:20", Sensor: "
 Product AMAZONIA1_WFI03801620230726CB10 - Date: "2023-07-26T14:41:40", Sensor: "WFI", Satellite: "AMAZONIA1"
 Product AMAZONIA1_WFI03801720230726CB10 - Date: "2023-07-26T14:43:20", Sensor: "WFI", Satellite: "AMAZONIA1"
 ```
+
+### MacOS
+
+Caso você seja usuário de MacOS e gostaria de utilizar a cli do `cbers4asat` no seu sistema operacional, você pode
+solicitar para que seja adicionado [abrindo uma issue](https://github.com/gabriel-russo/cbers4asat/issues) ou enviando um 
+e-mail para [gabrielrusso@protonmail.com](mailto:gabrielrusso@protonmail.com)
