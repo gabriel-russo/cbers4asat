@@ -15,6 +15,8 @@ intuitiva realizar diversas ações, como:
 
 Veja todos os [exemplos de uso](https://cbers4asat.readthedocs.io/pt_BR/latest/examples/) na documentação.
 
+Também disponível uma [Interface de Linha de Comando](https://www.hostinger.com.br/tutoriais/o-que-e-cli) (CLI) do `cbers4asat` para Windows e Linux. [Clique aqui e saiba mais](https://cbers4asat.readthedocs.io/pt_BR/latest/cli/).
+
 ---
 [![Latest Version](https://img.shields.io/pypi/v/cbers4asat?style=plastic)](https://pypi.python.org/pypi/cbers4asat/)
 [![Latest Version](https://img.shields.io/pypi/l/cbers4asat?style=plastic)](https://github.com/gabriel-russo/cbers4asat/blob/master/LICENSE)
@@ -23,6 +25,7 @@ Veja todos os [exemplos de uso](https://cbers4asat.readthedocs.io/pt_BR/latest/e
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Hatch project](https://img.shields.io/badge/%F0%9F%A5%9A-Hatch-4051b5.svg)](https://github.com/pypa/hatch)
 ![GitHub Workflow Status](https://github.com/gabriel-russo/cbers4asat/actions/workflows/build-cbers4asat.yml/badge.svg)
+![GitHub Workflow Status](https://github.com/gabriel-russo/cbers4asat/actions/workflows/build-cbers4asat-cli.yml/badge.svg)
 ![GitHub Workflow Status](https://github.com/gabriel-russo/cbers4asat/actions/workflows/test-cbers4asat.yml/badge.svg)
 [![Documentation Status](https://readthedocs.org/projects/cbers4asat/badge/?version=latest)](https://cbers4asat.readthedocs.io/pt_BR/latest/?badge=latest)
 > [Read this README in english (old version of docs)](https://github.com/gabriel-russo/cbers4asat/blob/master/en-US_README.md)
