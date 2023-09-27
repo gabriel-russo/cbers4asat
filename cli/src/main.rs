@@ -1,3 +1,5 @@
+pub mod cbers4asat;
+
 use crate::cbers4asat::Cbers4aAPI;
 use clap::Parser;
 use core::str::FromStr;
@@ -7,50 +9,59 @@ use std::fs::read_to_string;
 use std::path::PathBuf;
 use std::process;
 
-pub mod cbers4asat;
-
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about)]
 struct Args {
-    /// E-mail registered in dgi INPE explore (required)
-    #[arg(short, long, required = true)]
-    user: String,
+    /// E-mail registered in dgi INPE explore
+    #[arg(short, long, required = false)]
+    user: Option<String>,
 
-    /// Search area geometry as GeoJSON file (required)
-    #[arg(short, long, value_name = "FILE")]
-    geometry: PathBuf,
+    /// Search area geometry as GeoJSON file.
+    #[arg(short, long, required_unless_present = "id", value_name = "FILE")]
+    geometry: Option<PathBuf>,
 
-    /// Collection(s) name(s) (Optional) (Default: All collections)
-    #[arg(long, required = true, num_args = 1..=16)]
-    collection: Vec<String>,
+    /// Collection(s) name(s). (Default: All collections)
+    #[arg(long, default_value = None, required = false, num_args = 1..=16)]
+    collections: Option<Vec<String>>,
 
-    /// Start date of the query in the format YYYY-MM-DD (Optional) (Default: TODAY - 1 WEEK)
-    #[arg(short, long, default_value = None , required = false)]
+    /// Start date of the query in the format YYYY-MM-DD. (Default: TODAY - 1 WEEK)
+    #[arg(short, long, default_value = None)]
     start: Option<String>,
 
-    /// End date of the query in the format YYYY-MM-DD (Optional) (Default: TODAY)
-    #[arg(short, long, default_value = None , required = false)]
+    /// End date of the query in the format YYYY-MM-DD. (Default: TODAY)
+    #[arg(short, long, default_value = None)]
     end: Option<String>,
 
-    /// Maximum cloud cover in percent. (Optional) (Default: 100)
-    #[arg(short, long, default_value = None , required = false)]
+    /// Maximum cloud cover in percent. (Default: 100)
+    #[arg(short, long, default_value = None)]
     cloud: Option<u8>,
 
-    /// Maximum number of results to return. (Optional) (Default: 25)
-    #[arg(short, long, default_value = None , required = false)]
+    /// Maximum number of results to return. (Default: 25)
+    #[arg(short, long, default_value = None)]
     limit: Option<u16>,
 
-    /// Search scene by id  (Optional) (This argument must be used alone)
-    #[arg(short, long, exclusive = true, required = false)]
+    /// Search scene by id. (This argument must be used alone)
+    #[arg(short, long, exclusive = true)]
     id: Option<String>,
+
+    /// Download all returned scenes from query. (Requires --user)
+    #[arg(short, long, requires = "user")]
+    download: bool,
 }
 
 fn main() {
     let args = Args::parse();
 
-    let api: Cbers4aAPI = Cbers4aAPI { user: args.user };
+    let api: Cbers4aAPI = Cbers4aAPI {
+        user: args.user.unwrap_or("".to_string()),
+    };
 
-    let geojson_string: String = match read_to_string(args.geometry) {
+    if args.id.is_some() {
+        api.query_by_id(args.id.unwrap());
+        return;
+    }
+
+    let geojson_string: String = match read_to_string(args.geometry.unwrap()) {
         Ok(res) => res,
         Err(_) => {
             eprintln!("GeoJSON file not found");
@@ -83,7 +94,7 @@ fn main() {
 
         let res_geojson = api.query(
             &geom,
-            args.collection.clone(),
+            args.collections.clone(),
             args.start.clone(),
             args.end.clone(),
             args.cloud,
@@ -109,10 +120,13 @@ fn main() {
         let datetime = props.get("datetime").unwrap();
         let sensor = props.get("sensor").unwrap();
         let satellite = props.get("satellite").unwrap();
+        let cloud_cover = props.get("cloud_cover").unwrap();
+        let path = props.get("path").unwrap();
+        let row = props.get("row").unwrap();
 
         println!(
-            "Product {} - Date: {}, Sensor: {}, Satellite: {}",
-            id, datetime, sensor, satellite
+            "Product {} - Date: {}, Sensor: {}, Satellite: {}, Cloud: {}%, Path: {}, Row: {}",
+            id, datetime, sensor, satellite, cloud_cover, path, row
         );
     }
 }

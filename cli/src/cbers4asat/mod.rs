@@ -1,11 +1,11 @@
+mod stac;
+
 use core::str::FromStr;
 use geo::algorithm::bounding_rect::BoundingRect;
 use geo::Polygon;
 use geojson::{FeatureCollection, GeoJson};
-use stac_query::StacQuery;
-use std::process;
-
-pub mod stac_query;
+use stac::query::StacQuery;
+use std::process::exit;
 
 #[derive(Debug)]
 pub struct Cbers4aAPI {
@@ -16,7 +16,7 @@ impl Cbers4aAPI {
     pub fn query(
         &self,
         location: &Polygon,
-        collection: Vec<String>,
+        collections: Option<Vec<String>>,
         initial_date: Option<String>,
         end_date: Option<String>,
         cloud: Option<u8>,
@@ -25,7 +25,11 @@ impl Cbers4aAPI {
         let (minx, miny) = location.bounding_rect().unwrap().min().x_y();
         let (maxx, maxy) = location.bounding_rect().unwrap().max().x_y();
 
-        let mut stac_request = StacQuery::new([minx, miny, maxx, maxy], collection);
+        let mut stac_request = StacQuery::new([minx, miny, maxx, maxy]);
+
+        if collections.is_some() {
+            stac_request.with_collections(collections.unwrap());
+        }
 
         if initial_date.is_some() {
             stac_request.with_initial_date(initial_date.unwrap());
@@ -56,10 +60,10 @@ impl Cbers4aAPI {
             Ok(v) => {
                 if v.status().is_server_error() {
                     eprintln!("Server Error, try again later. Status: {}", v.status());
-                    process::exit(1);
+                    exit(1);
                 } else if v.status().is_client_error() {
                     eprintln!("Client Error. Status: {}", v.status());
-                    process::exit(1);
+                    exit(1);
                 }
 
                 let txt = &v.text().unwrap();
@@ -67,12 +71,16 @@ impl Cbers4aAPI {
             }
             Err(err) => {
                 eprintln!("Response error: {:?}", err);
-                process::exit(1);
+                exit(1);
             }
         };
 
         let res_geojson: FeatureCollection = res_geojson.try_into().unwrap();
 
         res_geojson
+    }
+
+    pub fn query_by_id(&self, scene_id: String) {
+        todo!()
     }
 }

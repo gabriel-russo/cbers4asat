@@ -1,3 +1,4 @@
+use super::metadata::collections::get_all_collections;
 use chrono::{DateTime, Duration, Local};
 use geojson::{JsonObject, JsonValue};
 use serde::{Deserialize, Serialize};
@@ -12,10 +13,10 @@ pub struct StacQuery {
 }
 
 impl StacQuery {
-    pub fn new(bbox: [f64; 4], collections: Vec<String>) -> StacQueryBuilder {
+    pub fn new(bbox: [f64; 4]) -> StacQueryBuilder {
         StacQueryBuilder {
             bbox,
-            collections,
+            collections: None,
             initial_date: None,
             end_date: None,
             limit: None,
@@ -27,7 +28,7 @@ impl StacQuery {
 #[derive(Debug, Default)]
 pub struct StacQueryBuilder {
     bbox: [f64; 4],
-    collections: Vec<String>,
+    collections: Option<Vec<String>>,
     initial_date: Option<String>,
     end_date: Option<String>,
     limit: Option<u16>,
@@ -36,6 +37,11 @@ pub struct StacQueryBuilder {
 
 // https://rust-unofficial.github.io/patterns/patterns/creational/builder.html
 impl StacQueryBuilder {
+    pub fn with_collections(&mut self, collections: Vec<String>) -> &mut Self {
+        self.collections = Some(collections);
+        self
+    }
+
     pub fn with_initial_date(&mut self, initial_date: String) -> &mut Self {
         self.initial_date = Some(initial_date);
         self
@@ -86,9 +92,17 @@ impl StacQueryBuilder {
             format!("{initial_date}T00:00:00/{end_date}T23:59:00")
         };
 
+        let collections = {
+            if self.collections.is_none() {
+                get_all_collections()
+            } else {
+                self.collections.clone().unwrap()
+            }
+        };
+
         StacQuery {
             bbox: self.bbox,
-            collections: self.collections.clone(),
+            collections,
             datetime,
             limit: self.limit.unwrap_or(25),
             query,
