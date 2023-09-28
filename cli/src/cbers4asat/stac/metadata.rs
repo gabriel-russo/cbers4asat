@@ -1,4 +1,5 @@
 pub mod collections {
+    use crate::cbers4asat::stac::utils::request::is_request_with_error;
     use geojson::JsonObject;
     use serde::Deserialize;
     use std::process::exit;
@@ -23,13 +24,7 @@ pub mod collections {
 
         let response_json: CollectionResponse = match resp {
             Ok(r) => {
-                if r.status().is_server_error() {
-                    eprintln!("Server Error, try again later. Status: {}", r.status());
-                    exit(1);
-                } else if r.status().is_client_error() {
-                    eprintln!("Client Error. Status: {}", r.status());
-                    exit(1);
-                }
+                is_request_with_error(&r);
 
                 let txt = &r.text().unwrap();
 

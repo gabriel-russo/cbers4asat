@@ -1,10 +1,12 @@
+pub mod print;
 mod stac;
 
 use core::str::FromStr;
 use geo::algorithm::bounding_rect::BoundingRect;
 use geo::Polygon;
-use geojson::{FeatureCollection, GeoJson};
+use geojson::{Feature, FeatureCollection, GeoJson};
 use stac::query::StacQuery;
+use stac::utils::request::is_request_with_error;
 use std::process::exit;
 
 #[derive(Debug)]
@@ -57,16 +59,10 @@ impl Cbers4aAPI {
             .send();
 
         let res_geojson: GeoJson = match res {
-            Ok(v) => {
-                if v.status().is_server_error() {
-                    eprintln!("Server Error, try again later. Status: {}", v.status());
-                    exit(1);
-                } else if v.status().is_client_error() {
-                    eprintln!("Client Error. Status: {}", v.status());
-                    exit(1);
-                }
+            Ok(r) => {
+                is_request_with_error(&r);
 
-                let txt = &v.text().unwrap();
+                let txt = &r.text().unwrap();
                 GeoJson::from_str(txt).unwrap()
             }
             Err(err) => {
@@ -80,7 +76,69 @@ impl Cbers4aAPI {
         res_geojson
     }
 
-    pub fn query_by_id(&self, scene_id: String) {
-        todo!()
+    pub fn query_by_id(&self, scene_id: String) -> FeatureCollection {
+        let client = reqwest::blocking::Client::new();
+
+        let collections = stac::metadata::collections::get_all_collections();
+
+        let mut to_search_collection_l2: String = String::new();
+        let mut to_search_collection_l4: String = String::new();
+
+        for collection in collections {
+            let collection_str_split: Vec<&str> = collection.split('_').collect();
+            let collection_satellite: &str = collection_str_split[0];
+            let collection_sensor: &str = collection_str_split[1];
+
+            let scene_id_str_split: Vec<&str> = scene_id.split('_').collect();
+            let scene_id_satellite: &str = scene_id_str_split[0];
+            let scene_id_sensor: &str = scene_id_str_split[1];
+
+            if scene_id_satellite.contains(collection_satellite)
+                && scene_id_sensor.contains(collection_sensor)
+            {
+                to_search_collection_l2 =
+                    format!("{collection_satellite}_{collection_sensor}_L2_DN");
+                to_search_collection_l4 =
+                    format!("{collection_satellite}_{collection_sensor}_L4_DN");
+                break;
+            }
+        }
+
+        let search_link_in_l2 = format!("http://www.dgi.inpe.br/lgi-stac/collections/{to_search_collection_l2}/items/{scene_id}");
+        let search_link_in_l4 = format!("http://www.dgi.inpe.br/lgi-stac/collections/{to_search_collection_l4}/items/{scene_id}");
+
+        let mut scene_data: FeatureCollection = FeatureCollection {
+            bbox: None,
+            features: vec![],
+            foreign_members: None,
+        };
+
+        for link in [search_link_in_l2, search_link_in_l4] {
+            let res = client.get(link).send();
+
+            match res {
+                Ok(r) => {
+                    is_request_with_error(&r);
+
+                    let txt = &r.text().unwrap();
+
+                    match GeoJson::from_str(txt) {
+                        Ok(g) => {
+                            match Feature::try_from(g) {
+                                Ok(f) => scene_data.features.push(f),
+                                Err(_) => continue,
+                            };
+                        }
+                        Err(_) => continue,
+                    };
+                }
+                Err(err) => {
+                    eprintln!("Response error: {:?}", err);
+                    exit(1);
+                }
+            };
+        }
+
+        scene_data
     }
 }

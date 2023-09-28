@@ -3,7 +3,7 @@ pub mod cbers4asat;
 use crate::cbers4asat::Cbers4aAPI;
 use clap::Parser;
 use core::str::FromStr;
-use geojson::{FeatureCollection, JsonObject};
+use geojson::FeatureCollection;
 use std::convert::From;
 use std::fs::read_to_string;
 use std::path::PathBuf;
@@ -57,7 +57,8 @@ fn main() {
     };
 
     if args.id.is_some() {
-        api.query_by_id(args.id.unwrap());
+        let products = api.query_by_id(args.id.unwrap());
+        cbers4asat::print::print_stac_feature_collection(products);
         return;
     }
 
@@ -106,27 +107,5 @@ fn main() {
         }
     }
 
-    println!("{} scenes found", all_products.features.len());
-    println!("---");
-
-    for feat in all_products {
-        let id = match feat.id.unwrap() {
-            geojson::feature::Id::String(v) => v,
-            geojson::feature::Id::Number(n) => n.to_string(),
-        };
-
-        let props: JsonObject = feat.properties.unwrap();
-
-        let datetime = props.get("datetime").unwrap();
-        let sensor = props.get("sensor").unwrap();
-        let satellite = props.get("satellite").unwrap();
-        let cloud_cover = props.get("cloud_cover").unwrap();
-        let path = props.get("path").unwrap();
-        let row = props.get("row").unwrap();
-
-        println!(
-            "Product {} - Date: {}, Sensor: {}, Satellite: {}, Cloud: {}%, Path: {}, Row: {}",
-            id, datetime, sensor, satellite, cloud_cover, path, row
-        );
-    }
+    cbers4asat::print::print_stac_feature_collection(all_products);
 }
