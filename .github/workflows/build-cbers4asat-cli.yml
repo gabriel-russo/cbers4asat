@@ -25,7 +25,7 @@ jobs:
           mkdir dist/
           tar -czvf dist/cbers4a-cli-linux.tar.gz --directory=target/release/ cbers4asat
       - name: Upload binaries
-        uses: svenstaro/upload-release-action@2.3.0
+        uses: svenstaro/upload-release-action@v2
         with:
           file: cli/dist/cbers4a-cli-linux.tar.gz
           repo_token: ${{ secrets.GH_TOKEN }}
@@ -50,7 +50,7 @@ jobs:
           mkdir dist/
           mv target/x86_64-pc-windows-gnu/release/cbers4asat.exe dist/
       - name: Upload binaries
-        uses: svenstaro/upload-release-action@2.3.0
+        uses: svenstaro/upload-release-action@v2
         with:
           file: cli/dist/cbers4asat.exe
           repo_token: ${{ secrets.GH_TOKEN }}
