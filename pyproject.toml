@@ -1,6 +1,6 @@
 [project]
 name = "cbers4asat"
-version = "0.7.1"
+version = "0.7.2"
 description = "Biblioteca Python para realizar a busca e processamento de imagens dos satélites CBERS-04A e AMAZONIA-1"
 authors = [
     { name = "Gabriel Russo", email = "gabrielrusso@protonmail.com" }]
@@ -46,6 +46,7 @@ packages = ["src/cbers4asat"]
 exclude = [
     "tests/",
     ".github/",
+    "cli/",
     ".flake8",
     "tox.ini"
 ]
