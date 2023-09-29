@@ -17,7 +17,7 @@ pub struct Cbers4aAPI {
 impl Cbers4aAPI {
     pub fn query(
         &self,
-        location: &Polygon,
+        location: Polygon,
         collections: Option<Vec<String>>,
         initial_date: Option<String>,
         end_date: Option<String>,

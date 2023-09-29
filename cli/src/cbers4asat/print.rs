@@ -1,13 +1,18 @@
 use geojson::{FeatureCollection, JsonObject};
 
-pub fn print_stac_feature_collection(feat_collection: FeatureCollection) {
+pub fn print_stac_feature_collection(feat_collection: &FeatureCollection) {
     println!("{} scenes found", feat_collection.features.len());
     println!("---");
 
     for feat in feat_collection {
-        let id: String = match feat.id.unwrap() {
-            geojson::feature::Id::String(v) => v,
-            geojson::feature::Id::Number(n) => n.to_string(),
+        let feat = feat.clone();
+
+        let id: String = match feat.id {
+            Some(id) => match id {
+                geojson::feature::Id::String(v) => v,
+                geojson::feature::Id::Number(n) => n.to_string(),
+            },
+            _ => String::default(),
         };
 
         let foreign_props: JsonObject = feat.foreign_members.unwrap();

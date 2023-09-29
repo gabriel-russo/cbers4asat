@@ -1,13 +1,16 @@
 pub mod cbers4asat;
 
 use crate::cbers4asat::Cbers4aAPI;
+use cbers4asat::print::print_stac_feature_collection;
+use chrono::Local;
 use clap::Parser;
 use core::str::FromStr;
+use geo::Polygon;
 use geojson::FeatureCollection;
-use std::convert::From;
-use std::fs::read_to_string;
-use std::path::PathBuf;
-use std::process;
+use std::convert::{From, TryInto};
+use std::fs::{read_to_string, write};
+use std::path::{Path, PathBuf};
+use std::process::exit;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about)]
@@ -47,54 +50,77 @@ struct Args {
     /// Download all returned scenes from query. (Requires --user)
     #[arg(short, long, requires = "user")]
     download: bool,
+
+    /// Save the STAC response as GeoJSON
+    #[arg(long)]
+    save: bool,
+
+    /// Specify where to save the GeoJSON with STAC response (Requires --save)
+    #[arg(
+        short,
+        long,
+        requires = "save",
+        default_value = "./",
+        value_name = "PATH"
+    )]
+    output: Option<String>,
 }
 
 fn main() {
-    let args = Args::parse();
+    let args: Args = Args::parse();
 
     let api: Cbers4aAPI = Cbers4aAPI {
-        user: args.user.unwrap_or("".to_string()),
+        user: args.user.unwrap_or_default(),
     };
 
     if args.id.is_some() {
-        let products = api.query_by_id(args.id.unwrap());
-        cbers4asat::print::print_stac_feature_collection(products);
+        let products: FeatureCollection = api.query_by_id(args.id.unwrap_or_default());
+        print_stac_feature_collection(&products);
         return;
     }
 
-    let geojson_string: String = match read_to_string(args.geometry.unwrap()) {
-        Ok(res) => res,
+    let geojson_string: String = match read_to_string(args.geometry.unwrap_or_default()) {
+        Ok(content) => content,
         Err(_) => {
             eprintln!("GeoJSON file not found");
-            process::exit(1)
+            exit(1)
         }
     };
 
-    let geojson = match FeatureCollection::from_str(geojson_string.as_str()) {
-        Ok(fc) => fc,
+    let geojson: FeatureCollection = match FeatureCollection::from_str(&geojson_string) {
+        Ok(feature_collection) => feature_collection,
         Err(_) => {
             eprintln!("Invalid GeoJSON");
-            process::exit(1)
+            exit(1)
         }
     };
 
-    let mut all_products: FeatureCollection = FeatureCollection {
+    let mut products: FeatureCollection = FeatureCollection {
         bbox: None,
         features: vec![],
         foreign_members: None,
     };
 
-    for feat in geojson.features {
-        let geom: geo::Polygon = match feat.geometry.unwrap().try_into() {
-            Ok(poly) => poly,
-            Err(_) => {
-                eprintln!("Some geometry in GeoJSON is not a valid Polygon.");
-                process::exit(1);
+    for feature in geojson.features {
+        let geom: Polygon = match feature.geometry {
+            Some(geometry) => {
+                let poly: Polygon = match geometry.try_into() {
+                    Ok(parsed_geom) => parsed_geom,
+                    Err(_) => {
+                        eprintln!("Only polygons are allowed");
+                        exit(1);
+                    }
+                };
+                poly
+            }
+            _ => {
+                eprintln!("Some geometry in GeoJSON is not a valid.");
+                exit(1);
             }
         };
 
-        let res_geojson = api.query(
-            &geom,
+        let response_geojson: FeatureCollection = api.query(
+            geom,
             args.collections.clone(),
             args.start.clone(),
             args.end.clone(),
@@ -102,10 +128,32 @@ fn main() {
             args.limit,
         );
 
-        for feat in res_geojson {
-            all_products.features.push(feat);
+        for feat in response_geojson {
+            products.features.push(feat);
         }
     }
 
-    cbers4asat::print::print_stac_feature_collection(all_products);
+    if args.save {
+        if !products.features.is_empty() {
+            let output: String = args.output.unwrap_or(String::from("./"));
+
+            let now: String = Local::now().format("%Y-%m-%d-%H:%M:%S").to_string();
+
+            let outfile: String = format!("cbers4asat-{now}.geojson");
+
+            let output: PathBuf = Path::new(&output).join(&outfile);
+
+            match write(output, products.to_string()) {
+                Ok(_) => {
+                    println!("---");
+                    println!("Output file saved - {}", outfile);
+                }
+                Err(_) => eprintln!("Error while saving output!"),
+            }
+        } else {
+            println!("Nothing to save.");
+        }
+    }
+
+    print_stac_feature_collection(&products);
 }
