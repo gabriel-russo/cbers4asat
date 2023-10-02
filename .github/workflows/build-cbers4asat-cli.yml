@@ -11,7 +11,7 @@ env:
 
 jobs:
   cli-linux-build:
-    name: Build LINUX binary
+    name: Build LINUX binaries
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -20,17 +20,28 @@ jobs:
       - uses: actions/checkout@v3
       - name: Build linux binaries
         run: cargo build --release
-      - name: Shipping linux binary
+
+      - name: Shipping generic linux binary
         run: |
           mkdir dist/
-          tar -czvf dist/cbers4a-cli-linux.tar.gz --directory=target/release/ cbers4asat
+          tar -czvf dist/cbers4asat-x86_64-unknown-linux-gnu.tar.gz --directory=target/release/ cbers4asat
+
+      - name: Shipping debian linux binary
+        run: |
+          mkdir -p package/deb/usr/bin
+          cp target/release/cbers4asat package/deb/usr/bin
+          cp -r package/deb /tmp/cbers4asat
+          dpkg-deb --build /tmp/cbers4asat
+          cp /tmp/cbers4asat.deb dist/
+
       - name: Upload binaries
         uses: svenstaro/upload-release-action@v2
         with:
-          file: cli/dist/cbers4a-cli-linux.tar.gz
+          file: cli/dist/*
+          file_glob: true
           repo_token: ${{ secrets.GH_TOKEN }}
           tag: ${{ github.ref }}
-          asset_name: cbers4a-cli-linux.tar.gz
+
   cli-windows-build:
     name: Build WINDOWS binary
     runs-on: ubuntu-latest
