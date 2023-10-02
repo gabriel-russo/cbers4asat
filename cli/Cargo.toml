@@ -1,7 +1,7 @@
 [package]
 name = "cbers4asat"
 description = "Command Line interface for searching and downloading satellite imagery from CBERS-04A and AMAZONIA-1 Catalog"
-version = "0.3.1"
+version = "0.3.2"
 edition = "2021"
 authors = ["Gabriel Russo <gabrielrusso@protonmail.com>"]
 
