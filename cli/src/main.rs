@@ -8,6 +8,7 @@ use core::str::FromStr;
 use geo::Polygon;
 use geojson::FeatureCollection;
 use std::convert::{From, TryInto};
+use std::env::current_dir;
 use std::fs::{read_to_string, write};
 use std::path::{Path, PathBuf};
 use std::process::exit;
@@ -56,13 +57,7 @@ struct Args {
     save: bool,
 
     /// Specify where to save the GeoJSON with STAC response (Requires --save)
-    #[arg(
-        short,
-        long,
-        requires = "save",
-        default_value = "./",
-        value_name = "PATH"
-    )]
+    #[arg(short, long, requires = "save", value_name = "PATH")]
     output: Option<String>,
 }
 
@@ -135,20 +130,26 @@ fn main() {
 
     if args.save {
         if !products.features.is_empty() {
-            let output: String = args.output.unwrap_or(String::from("./"));
-
-            let now: String = Local::now().format("%Y-%m-%d-%H:%M:%S").to_string();
+            let now: String = Local::now().format("%Y-%m-%d-%Hh%Mm%Ss").to_string();
 
             let outfile: String = format!("cbers4asat-{now}.geojson");
 
-            let output: PathBuf = Path::new(&output).join(&outfile);
+            let output: PathBuf = match args.output {
+                Some(path) => Path::new(&path).join(&outfile),
+                None => {
+                    let pwd: PathBuf =
+                        current_dir().expect("Error while trying to read your directory");
+
+                    pwd.join(&outfile)
+                }
+            };
 
             match write(output, products.to_string()) {
                 Ok(_) => {
                     println!("---");
                     println!("Output file saved - {}", outfile);
                 }
-                Err(_) => eprintln!("Error while saving output!"),
+                Err(err) => eprintln!("Error while saving output! Error: {}", err),
             }
         } else {
             println!("Nothing to save.");

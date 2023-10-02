@@ -97,7 +97,7 @@ cbers4asat -g area.geojson --collections CBERS4A_WPM_L4_DN AMAZONIA_WFI_L2_DN --
 Todos os comandos do exemplo de linux irão funcionar no windows, basta adicionar o sufixo ".exe" do executável.
 
 ```commandline
-cbers4asat.exe --geometry area.geojson --collections AMAZONIA1_WFI_L4_DN AMAZONIA1_WFI_L2_DN --start 2023-07-25
+.\cbers4asat.exe --geometry area.geojson --collections AMAZONIA1_WFI_L4_DN AMAZONIA1_WFI_L2_DN --start 2023-07-25
 ```
 
 Output:
