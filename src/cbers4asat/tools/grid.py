@@ -44,6 +44,8 @@ def grid_download(
                     for chunk in req.iter_content(chunk_size=1024):
                         if chunk:
                             f.write(chunk)
+            else:
+                raise ValueError("Download unavailable")
         else:
             raise ValueError("Sensors available: mux and wfi")
     else:
