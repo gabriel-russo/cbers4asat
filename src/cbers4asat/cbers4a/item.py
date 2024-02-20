@@ -2,7 +2,9 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
-import requests
+from urllib3.util import Retry
+from requests import Session
+from requests.adapters import HTTPAdapter
 from os.path import join
 
 
@@ -182,13 +184,27 @@ class Item(object):
         """
         return self._feature["assets"][asset]["href"]
 
-    def download(self, asset, credential, outdir, session=requests.Session()):
+    def download(self, asset, credential, outdir, session=Session()):
         """
         Download the asset.
         """
         url = self.url(asset)
         filename = url.split("/")[-1]
         outfile = join(outdir, filename)
+
+        retries = Retry(
+            total=3,
+            connect=3,
+            read=3,
+            status=3,
+            other=3,
+            backoff_factor=1,
+            status_forcelist=[500, 501, 502, 503, 504],
+            allowed_methods={"GET"},
+        )
+
+        session.mount("http://", HTTPAdapter(max_retries=retries))
+
         r = session.get(
             url,
             params={

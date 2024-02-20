@@ -202,7 +202,7 @@ class Cbers4aAPI:
         outdir: str = getcwd(),
         with_folder: bool = False,
     ):
-        ...
+        pass
 
     @overload
     def download(
@@ -213,7 +213,7 @@ class Cbers4aAPI:
         outdir: str = getcwd(),
         with_folder: bool = False,
     ):
-        ...
+        pass
 
     def download(
         self,
