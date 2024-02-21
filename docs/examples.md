@@ -17,8 +17,11 @@
 ## Projetos que utilizam a biblioteca `cbers4asat`:
 > Caso você tenha um projeto que utiliza a biblioteca, me envie um email para adicioná-lo aqui. gabrielrusso@protonmail.com
 
-### 1 - Mosaico de imagens do Estado de Rondônia automatizado
+### 1 - Mosaico de imagens do Estado de Rondônia automatizado.
  - [gabriel-russo/mosaico-cbers4a](https://github.com/gabriel-russo/mosaico-cbers4a)
+
+### 2 - Baixar a cena mais recente do Rio Madeira (RO), criar composição RGB e gerar XYZ tiles.
+ - [gabriel-russo/monitoramento-rio-madeira](https://github.com/gabriel-russo/monitoramento-rio-madeira)
 
 ## Buscando produtos com Bounding Box:
 
@@ -33,10 +36,13 @@ from datetime import date
 api = Cbers4aAPI('seu.login@email.com')
 
 # Bouding Box escolhido
-bbox = [-63.92944335937501,
-        -8.819260401678381,
-        -63.79211425781251,
-        -8.722218306198739]
+#   O bounding box é formado por 4 coordenadas: [x_min, y_min, x_max, y_max],
+#   correspondendo respectivamente a: [oeste, sul, leste, norte].
+#   Sendo essa ordem um fator importante para o funcionamento da busca
+bbox = [-63.92944335937501, # Oeste
+        -8.819260401678381, # Sul
+        -63.79211425781251, # Leste
+        -8.722218306198739] # Norte
 
 # Intervalo de data para a busca
 data_inicial = date(2021, 8, 25)
@@ -124,7 +130,7 @@ api = Cbers4aAPI('meu@email.com')
 # Nota: após a versão 0.7 você deve especificar a coleção que a imagem pertence,
 #   segue a mesma lógica da função query
 
-# Nota2: Não é possível misturar coleções neste método assim como o query
+# Nota2: Não é possível misturar coleções neste método
 
 # Buscando pelo ID de uma cena
 produto = api.query_by_id(scene_id='CBERS4A_WPM22912420210830', collection="CBERS4A_WPM_L4_DN")
