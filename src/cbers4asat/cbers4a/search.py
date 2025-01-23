@@ -4,20 +4,19 @@
 from .collection import Collections
 from .itemCollection import ItemCollection
 from requests import Session, get
+from os.path import join
 
 
 class Search(object):
     """Simple class to search INPE STAC Catalog"""
 
     # INPE STAC Catalog
-    base_url = "http://www.dgi.inpe.br/lgi-stac"
-    collection_endpoint = "/collections"
-    search_endpoint = "/search"
+    base_url = "https://www.dgi.inpe.br/stac-compose/stac"
+    base_url_search_item = "https://www.dgi.inpe.br/lgi-stac"
+    collection_endpoint = "collections"
+    search_endpoint = "search"
 
-    # http
-    # timeout = 12
-
-    def __init__(self, **default_search_keys):
+    def __init__(self):
         """
         Simple class to search INPE STAC Catalog.
 
@@ -28,23 +27,27 @@ class Search(object):
                 reverse(str1):The string which gets reversed.
         """
         self.session = Session()
-        self._default_search_keys = default_search_keys
-        self.search_keys = dict()
-        self.update(**default_search_keys)
+        self.providers_body = dict(name="LGI-CDSR", method="POST")
+        self.request_body = dict(
+            providers=[],
+            fromCatalog="yes",
+        )
 
-    def __call__(self, **search_keys):
+    def __call__(self):
         """
         docstring
         """
-        query_keys = search_keys.pop("query", None)
-        if query_keys is not None:
-            self.query(**query_keys)
-        self.update(**search_keys)
-        if "ids" in self.search_keys:
+        if "ids" in self.request_body:
             features = []
-            for id_ in self.search_keys["ids"]:
+            for id_ in self.request_body["ids"]:
                 r = self.session.get(
-                    f'{self.base_url}{self.collection_endpoint}/{self.search_keys["collection"]}/items/{id_}'
+                    join(
+                        self.base_url_search_item,
+                        self.collection_endpoint,
+                        self.request_body["collection"],
+                        "items",
+                        id_,
+                    )
                 )
                 r.raise_for_status()
                 if r.status_code == 200:
@@ -54,29 +57,28 @@ class Search(object):
             return ItemCollection({"type": "FeatureCollection", "features": features})
         else:
             r = self.session.post(
-                self.base_url + self.search_endpoint, json=self.search_keys
+                join(self.base_url, self.search_endpoint), json=self.request_body
             )
             r.raise_for_status()
             if r.status_code == 200:
-                return ItemCollection(r.json())
+                collections = r.json()["LGI-CDSR"]  # Enter LGI-CDSR Collections
+                feature_collection = {"type": "FeatureCollection", "features": []}
+                for name, content in collections.items():
+                    # Append all collection features in one
+                    feature_collection["features"].extend(content["features"])
+                return ItemCollection(feature_collection)
 
     def update(self, **search_keys):
         """
         docstring
         """
-        self.search_keys.update(search_keys)
-
-    def defaults(self):
-        """
-        docstring
-        """
-        self.update(**self._default_search_keys)
+        self.request_body.update(search_keys)
 
     def clear(self):
         """
         docstring
         """
-        self.search_keys = dict()
+        self.request_body = dict()
 
     def close(self):
         """
@@ -85,14 +87,18 @@ class Search(object):
         self.session.close()
         self.session = None
 
+    def providers(self, **search_keys):
+        """
+        docstring
+        """
+        self.providers_body.update(search_keys)
+        self.request_body.update(providers=[self.providers_body])
+
     def query(self, **properties_keys):
         """
         docstring
         """
-        if "query" in self.search_keys:
-            self.search_keys["query"].update(properties_keys)
-        else:
-            self.search_keys.update({"query": properties_keys})
+        self.providers(query=properties_keys)
 
     def bbox(self, bbox: list) -> None:
         """
@@ -114,7 +120,7 @@ class Search(object):
         """
         docstring
         """
-        self.update(datetime=f"{start}T00:00:00Z/{end}T23:59:00Z")
+        self.update(datetime=f"{start}T00:00:00/{end}T23:59:00")
 
     def intersects(self, intersects):
         """
@@ -127,9 +133,11 @@ class Search(object):
         docstring
         """
         if isinstance(collections, str):
-            self.update(collection=collections)
+            self.request_body.update(collection=collections)
         else:
-            self.update(collections=collections)
+            self.providers(
+                collections=[{"name": collection} for collection in collections]
+            )
 
     def ids(self, ids):
         """

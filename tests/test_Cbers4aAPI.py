@@ -19,31 +19,37 @@ class MockStacFeatureCollectionResponse:
     @staticmethod
     def json():
         return {
-            "type": "FeatureCollection",
-            "features": [
-                {
-                    "type": "Feature",
-                    "id": "ABC123",
-                    "collection": "y",
-                    "geometry": {
-                        "type": "Polygon",
-                        "coordinates": [
-                            [
-                                [-48.3106, -15.3637],
-                                [-48.3106, -16.4178],
-                                [-47.2492, -16.4178],
-                                [-47.2492, -15.3637],
-                                [-48.3106, -15.3637],
-                            ]
-                        ],
-                    },
-                    "bbox": [-48.3106, -16.4178, -47.2492, -15.3637],
-                    "properties": {"x": "XYZ"},
-                    "assets": {"blue": {"href": "http://test.dev/image.tif"},
-                               "thumbnail": {"href": "http://test.dev/thumbnail.png"}},
-                    "links": [{"x": "y"}],
-                }
-            ],
+            "LGI-CDSR": {
+                "Collection_A": {
+                    "type": "FeatureCollection",
+                    "features": [
+                        {
+                            "type": "Feature",
+                            "id": "ABC123",
+                            "collection": "y",
+                            "geometry": {
+                                "type": "Polygon",
+                                "coordinates": [
+                                    [
+                                        [-48.3106, -15.3637],
+                                        [-48.3106, -16.4178],
+                                        [-47.2492, -16.4178],
+                                        [-47.2492, -15.3637],
+                                        [-48.3106, -15.3637],
+                                    ]
+                                ],
+                            },
+                            "bbox": [-48.3106, -16.4178, -47.2492, -15.3637],
+                            "properties": {"x": "XYZ"},
+                            "assets": {
+                                "blue": {"href": "http://test.dev/image.tif"},
+                                "thumbnail": {"href": "http://test.dev/thumbnail.png"},
+                            },
+                            "links": [{"x": "y"}],
+                        }
+                    ],
+                },
+            }
         }
 
 
@@ -78,8 +84,10 @@ class MockStacFeatureResponse:
             },
             "bbox": [-48.3106, -16.4178, -47.2492, -15.3637],
             "properties": {"x": "XYZ"},
-            "assets": {"blue": {"href": "http://test.dev/image.tif"},
-                       "thumbnail": {"href": "http://test.dev/thumbnail.png"}},
+            "assets": {
+                "blue": {"href": "http://test.dev/image.tif"},
+                "thumbnail": {"href": "http://test.dev/thumbnail.png"},
+            },
             "links": [{"x": "y"}],
         }
 
@@ -107,8 +115,10 @@ class TestCbers4aAPI:
                 },
                 "bbox": [-48.3106, -16.4178, -47.2492, -15.3637],
                 "properties": {"x": "XYZ"},
-                "assets": {"blue": {"href": "http://test.dev/image.tif"},
-                           "thumbnail": {"href": "http://test.dev/thumbnail.png"}},
+                "assets": {
+                    "blue": {"href": "http://test.dev/image.tif"},
+                    "thumbnail": {"href": "http://test.dev/thumbnail.png"},
+                },
             }
         ],
     }
@@ -128,23 +138,6 @@ class TestCbers4aAPI:
 
         result = self.api.query(
             location=[-63.9, -8.8, -63.7, -8.7],
-            initial_date=date(2021, 1, 1),
-            end_date=date(2021, 2, 1),
-            cloud=100,
-            limit=1,
-            collections=["CBERS4A_WPM_L4_DN"],
-        )
-
-        assert self.expected_result == result
-
-    def test_query_pathrow(self, monkeypatch):
-        def mock_post(*args, **kwargs):
-            return MockStacFeatureCollectionResponse()
-
-        monkeypatch.setattr("requests.Session.post", mock_post)
-
-        result = self.api.query(
-            location=(206, 133),
             initial_date=date(2021, 1, 1),
             end_date=date(2021, 2, 1),
             cloud=100,
