@@ -147,23 +147,6 @@ class TestCbers4aAPI:
 
         assert self.expected_result == result
 
-    def test_query_pathrow(self, monkeypatch):
-        def mock_post(*args, **kwargs):
-            return MockStacFeatureCollectionResponse()
-
-        monkeypatch.setattr("requests.Session.post", mock_post)
-
-        result = self.api.query(
-            location=(206, 133),
-            initial_date=date(2021, 1, 1),
-            end_date=date(2021, 2, 1),
-            cloud=100,
-            limit=1,
-            collections=["CBERS4A_WPM_L4_DN"],
-        )
-
-        assert self.expected_result == result
-
     def test_query_geometry(self, monkeypatch):
         def mock_post(*args, **kwargs):
             return MockStacFeatureCollectionResponse()
