@@ -12,6 +12,7 @@ class Search(object):
 
     # INPE STAC Catalog
     base_url = "https://www.dgi.inpe.br/stac-compose/stac"
+    base_url_search_item = "https://www.dgi.inpe.br/lgi-stac"
     collection_endpoint = "collections"
     search_endpoint = "search"
 
@@ -41,7 +42,7 @@ class Search(object):
             for id_ in self.request_body["ids"]:
                 r = self.session.get(
                     join(
-                        self.base_url,
+                        self.base_url_search_item,
                         self.collection_endpoint,
                         self.request_body["collection"],
                         "items",
@@ -60,7 +61,12 @@ class Search(object):
             )
             r.raise_for_status()
             if r.status_code == 200:
-                return ItemCollection(r.json())
+                collections = r.json()["LGI-CDSR"]  # Enter LGI-CDSR Collections
+                feature_collection = {"type": "FeatureCollection", "features": []}
+                for name, content in collections.items():
+                    # Append all collection features in one
+                    feature_collection["features"].extend(content["features"])
+                return ItemCollection(feature_collection)
 
     def update(self, **search_keys):
         """
@@ -127,7 +133,7 @@ class Search(object):
         docstring
         """
         if isinstance(collections, str):
-            self.providers(collection=collections)
+            self.request_body.update(collection=collections)
         else:
             self.providers(
                 collections=[{"name": collection} for collection in collections]

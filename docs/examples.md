@@ -15,7 +15,8 @@
 * [Recortando raster com GeoDataFrame](#recortando-raster-a-partir-de-uma-mascara-geodataframe)
 
 ## Projetos que utilizam a biblioteca `cbers4asat`:
-> Caso você tenha um projeto que utiliza a biblioteca, me envie um email para adicioná-lo aqui. gabrielrusso@protonmail.com
+> Caso você tenha um projeto que utiliza a biblioteca, faça um pull request modificando docs/examples.md ou me envie um 
+email para adicioná-lo aqui. gabrielrusso@protonmail.com
 
 ### 1 - Mosaico de imagens do Estado de Rondônia automatizado.
  - [gabriel-russo/mosaico-cbers4a](https://github.com/gabriel-russo/mosaico-cbers4a)

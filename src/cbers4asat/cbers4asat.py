@@ -25,7 +25,7 @@ class Cbers4aAPI:
     @staticmethod
     def query(
         *,
-        location: Union[List[float], Tuple, Polygon],
+        location: Union[List[float], Polygon],
         initial_date: date,
         end_date: date,
         cloud: int,
@@ -73,13 +73,10 @@ class Cbers4aAPI:
 
         if isinstance(location, list):
             search.bbox(location)
-        elif isinstance(location, tuple):
-            path, row = location
-            search.path_row(path, row)
         elif isinstance(location, Polygon):
             search.bbox(list(location.bounds))
         else:
-            raise Exception("Provide a bbox or a path row")
+            raise Exception("Provide a bbox or Polygon")
 
         search.date(initial_date.isoformat(), end_date.isoformat())
         search.cloud_cover("<=", cloud)

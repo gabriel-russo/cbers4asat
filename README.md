@@ -1,4 +1,4 @@
-# cbers4asat
+# 🛰️ cbers4asat 🇧🇷
 
 ## Descrição
 
@@ -31,6 +31,9 @@ Também disponível uma [Interface de Linha de Comando](https://www.hostinger.co
 > [Read this README in english (old version of docs)](https://github.com/gabriel-russo/cbers4asat/blob/master/en-US_README.md)
 > 🇺🇸
 
+## Avisos:
+- Busca por path row desabilitada devido a grandes mudanças na API STAC. Até achar uma solução, mantém-se desabilitada.
+
 ## Busque imagens com poucas linhas de código
 
 ```python
@@ -41,11 +44,14 @@ from datetime import date
 api = Cbers4aAPI('email@mail.com')
 
 # Área de interesse. Pode ser: bouding box, path row ou polygon.
-path_row = (229, 124)
+bbox = [-63.92944335937501, # Oeste
+        -8.819260401678381, # Sul
+        -63.79211425781251, # Leste
+        -8.722218306198739] # Norte
 
 # Buscando metadados. Este exemplo utiliza o path row (órbita/ponto). 
 # Consulte a órbita/ponto: http://www.dgi.inpe.br/documentacao/grades
-produtos = api.query(location=path_row,
+produtos = api.query(location=bbox,
                      initial_date=date(2021, 6, 1),
                      end_date=date(2021, 7, 1),
                      cloud=100,
@@ -118,7 +124,7 @@ no [painel de projetos](https://github.com/gabriel-russo/cbers4asat/projects)
 
 # Licença
 
-Copyright (c) 2024 Gabriel Russo
+Copyright (c) 2025 Gabriel Russo
 
 Copyright (c) 2020 Sandro Klippel
 
