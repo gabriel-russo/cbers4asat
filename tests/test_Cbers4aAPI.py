@@ -42,10 +42,8 @@ class MockStacFeatureCollectionResponse:
                             "bbox": [-48.3106, -16.4178, -47.2492, -15.3637],
                             "properties": {"x": "XYZ"},
                             "assets": {
-                                "blue": {"href": "http://test.dev/image.tif"},
                                 "thumbnail": {"href": "http://test.dev/thumbnail.png"},
                             },
-                            "links": [{"x": "y"}],
                         }
                     ],
                 },
@@ -94,7 +92,35 @@ class MockStacFeatureResponse:
 
 class TestCbers4aAPI:
     api = Cbers4aAPI("test@test.com")
-    expected_result = {
+    expected_result_lookup = {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "id": "ABC123",
+                "collection": "y",
+                "geometry": {
+                    "type": "Polygon",
+                    "coordinates": [
+                        [
+                            [-48.3106, -15.3637],
+                            [-48.3106, -16.4178],
+                            [-47.2492, -16.4178],
+                            [-47.2492, -15.3637],
+                            [-48.3106, -15.3637],
+                        ]
+                    ],
+                },
+                "bbox": [-48.3106, -16.4178, -47.2492, -15.3637],
+                "properties": {"x": "XYZ"},
+                "assets": {
+                    "thumbnail": {"href": "http://test.dev/thumbnail.png"},
+                },
+            }
+        ],
+    }
+
+    expected_result_query = {
         "type": "FeatureCollection",
         "features": [
             {
@@ -145,7 +171,7 @@ class TestCbers4aAPI:
             collections=["CBERS4A_WPM_L4_DN"],
         )
 
-        assert self.expected_result == result
+        assert self.expected_result_lookup == result
 
     def test_query_geometry(self, monkeypatch):
         def mock_post(*args, **kwargs):
@@ -173,7 +199,7 @@ class TestCbers4aAPI:
             collections=["CBERS4A_WPM_L4_DN"],
         )
 
-        assert self.expected_result == result
+        assert self.expected_result_lookup == result
 
     def test_query_by_id_str(self, monkeypatch):
         def mock_get(*args, **kwargs):
@@ -183,7 +209,7 @@ class TestCbers4aAPI:
 
         result = self.api.query_by_id(scene_id="ABC123", collection="y")
 
-        assert self.expected_result == result
+        assert self.expected_result_query == result
 
     def test_query_by_id_list(self, monkeypatch):
         def mock_get(*args, **kwargs):
@@ -193,10 +219,10 @@ class TestCbers4aAPI:
 
         result = self.api.query_by_id(scene_id=["ABC123"], collection="y")
 
-        assert self.expected_result == result
+        assert self.expected_result_query == result
 
     def test_to_geodataframe(self):
-        gdf = self.api.to_geodataframe(self.expected_result)
+        gdf = self.api.to_geodataframe(self.expected_result_lookup)
         assert type(gdf).__name__ == "GeoDataFrame"
         assert gdf.crs == "EPSG:4326"
         assert len(gdf) == 1
@@ -204,22 +230,26 @@ class TestCbers4aAPI:
     def test_missing_credentials_exception(self):
         with pytest.raises(Exception):
             api = Cbers4aAPI("")
-            api.download(self.expected_result, bands=["blue"])
+            api.download(self.expected_result_lookup, bands=["blue"])
 
     def test_missing_credentials_exception_geodataframe(self):
         with pytest.raises(Exception):
             api = Cbers4aAPI("")
-            gdf = api.to_geodataframe(self.expected_result)
+            gdf = api.to_geodataframe(self.expected_result_lookup)
             api.download(gdf, bands=["blue"])
 
     def test_download(self, monkeypatch, tmp_path):
-        def mock_get(*args, **kwargs):
+        def mock_post(*args, **kwargs):
             return MockStacFeatureCollectionResponse()
 
+        def mock_get(*args, **kwargs):
+            return MockStacFeatureResponse()
+
+        monkeypatch.setattr("requests.Session.post", mock_post)
         monkeypatch.setattr("requests.Session.get", mock_get)
 
         self.api.download(
-            products=self.expected_result,
+            products=self.expected_result_lookup,
             bands=["blue"],
             threads=1,
             outdir=tmp_path.as_posix(),
@@ -232,12 +262,16 @@ class TestCbers4aAPI:
         remove(f"{tmp_path.as_posix()}/ABC123/image.tif")
 
     def test_download_gdf(self, monkeypatch, tmp_path):
+        def mock_post(*args, **kwargs):
+            return MockStacFeatureCollectionResponse()
+
         def mock_get(*args, **kwargs):
             return MockStacFeatureResponse()
 
+        monkeypatch.setattr("requests.Session.post", mock_post)
         monkeypatch.setattr("requests.Session.get", mock_get)
 
-        gdf = self.api.to_geodataframe(self.expected_result)
+        gdf = self.api.to_geodataframe(self.expected_result_lookup)
 
         self.api.download(
             products=gdf,

@@ -148,7 +148,7 @@ class Cbers4aAPI:
     ):
         self.__check_for_exception(products, bands, outdir)
 
-        products = ItemCollection(products).items()
+        products_search_list = ItemCollection(products).items()
 
         with ThreadPoolExecutor(
             max_workers=threads, thread_name_prefix="cbers4a"
@@ -158,13 +158,19 @@ class Cbers4aAPI:
 
             if with_folder:
                 root = outdir  # Save the outdir start point (to looks like a pushd and popd)
-            for product in products:
-                if with_folder:
-                    new_path = join(root, product.id)
-                    makedirs(new_path, exist_ok=True)
-                    outdir = new_path
-                for band in bands:
-                    pool.submit(product.download, band, self.user, outdir)
+
+            for product_lookup in products_search_list:
+                products_query = self.query_by_id(
+                    product_lookup.id, product_lookup.collection
+                )
+                product_metadata = ItemCollection(products_query).items()
+                for product in product_metadata:
+                    if with_folder:
+                        new_path = join(root, product.id)
+                        makedirs(new_path, exist_ok=True)
+                        outdir = new_path
+                    for band in bands:
+                        pool.submit(product.download, band, self.user, outdir)
 
     def __download_gdf(
         self,
