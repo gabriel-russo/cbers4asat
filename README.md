@@ -15,8 +15,6 @@ intuitiva realizar diversas ações, como:
 
 Veja todos os [exemplos de uso](https://cbers4asat.readthedocs.io/pt_BR/latest/examples/) na documentação.
 
-Também disponível uma [Interface de Linha de Comando](https://www.hostinger.com.br/tutoriais/o-que-e-cli) (CLI) do `cbers4asat` para Windows e Linux. [Clique aqui e saiba mais](https://cbers4asat.readthedocs.io/pt_BR/latest/cli/).
-
 ---
 [![Latest Version](https://img.shields.io/pypi/v/cbers4asat?style=plastic)](https://pypi.python.org/pypi/cbers4asat/)
 [![Latest Version](https://img.shields.io/pypi/l/cbers4asat?style=plastic)](https://github.com/gabriel-russo/cbers4asat/blob/master/LICENSE)
@@ -33,6 +31,7 @@ Também disponível uma [Interface de Linha de Comando](https://www.hostinger.co
 
 ## Avisos:
 - Busca por path row desabilitada devido a grandes mudanças na API STAC. Até achar uma solução, mantém-se desabilitada.
+- CLI descontinuada.
 
 ## Busque imagens com poucas linhas de código
 
