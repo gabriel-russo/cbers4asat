@@ -201,6 +201,17 @@ class TestCbers4aAPI:
         assert gdf.crs == "EPSG:4326"
         assert len(gdf) == 1
 
+    def test_missing_credentials_exception(self):
+        with pytest.raises(Exception):
+            api = Cbers4aAPI("")
+            api.download(self.expected_result, bands=["blue"])
+
+    def test_missing_credentials_exception_geodataframe(self):
+        with pytest.raises(Exception):
+            api = Cbers4aAPI("")
+            gdf = api.to_geodataframe(self.expected_result)
+            api.download(gdf, bands=["blue"])
+
     def test_download(self, monkeypatch, tmp_path):
         def mock_get(*args, **kwargs):
             return MockStacFeatureCollectionResponse()
