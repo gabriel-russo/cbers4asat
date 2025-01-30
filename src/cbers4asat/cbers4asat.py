@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from concurrent.futures import ThreadPoolExecutor
-from .cbers4a import Search, ItemCollection
 from datetime import date
-from typing import List, overload, Dict, Union, Tuple
+from os import getcwd, cpu_count, makedirs
 from os.path import isdir, join
-from os import getcwd, cpu_count, mkdir
+from typing import List, overload, Dict, Union
 from geopandas import GeoDataFrame
 from shapely.geometry import Polygon
+from .cbers4a import Search, ItemCollection
 
 
 class Cbers4aAPI:
-    def __init__(self, user):
+    def __init__(self, user: str):
         self._user = user
 
     @property
@@ -19,7 +19,7 @@ class Cbers4aAPI:
         return self._user
 
     @user.setter
-    def user(self, user):
+    def user(self, user: str):
         self._user = user
 
     @staticmethod
@@ -153,15 +153,18 @@ class Cbers4aAPI:
         with ThreadPoolExecutor(
             max_workers=threads, thread_name_prefix="cbers4a"
         ) as pool:
+            if not self.user:
+                raise Exception("Credentials not provided!")
+
             if with_folder:
                 root = outdir  # Save the outdir start point (to looks like a pushd and popd)
             for product in products:
                 if with_folder:
                     new_path = join(root, product.id)
-                    mkdir(new_path)
+                    makedirs(new_path, exist_ok=True)
                     outdir = new_path
                 for band in bands:
-                    pool.submit(product.download, band, self._user, outdir)
+                    pool.submit(product.download, band, self.user, outdir)
 
     def __download_gdf(
         self,
@@ -176,19 +179,23 @@ class Cbers4aAPI:
         with ThreadPoolExecutor(
             max_workers=threads, thread_name_prefix="cbers4a_gdf"
         ) as pool:
+            if not self.user:
+                raise Exception("Credentials not provided!")
+
             if with_folder:
                 root = outdir  # Save the outdir start point (to looks like a pushd and popd)
+
             for index, row in products.iterrows():
                 if with_folder:
                     new_path = join(root, str(index))
-                    mkdir(new_path)
+                    makedirs(new_path, exist_ok=True)
                     outdir = new_path
 
                 products_query = self.query_by_id(str(index), row.collection)
                 products_query = ItemCollection(products_query).items()
                 for product in products_query:
                     for band in bands:
-                        pool.submit(product.download, band, self._user, outdir)
+                        pool.submit(product.download, band, self.user, outdir)
 
     @overload
     def download(

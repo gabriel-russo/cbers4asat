@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
-from urllib3.util import Retry
+from os.path import join, basename
 from requests import Session
 from requests.adapters import HTTPAdapter
-from os.path import join
+from urllib3.util import Retry
 
 
 class Item(object):
@@ -184,12 +184,17 @@ class Item(object):
         """
         return self._feature["assets"][asset]["href"]
 
-    def download(self, asset, credential, outdir, session=Session()):
+    def download(
+        self, asset: dict, credential: str, outdir: str, session: Session = Session()
+    ):
         """
         Download the asset.
         """
+        if not credential or credential == "":
+            raise Exception("Credentials not provided!")
+
         url = self.url(asset)
-        filename = url.split("/")[-1]
+        filename = basename(url)
         outfile = join(outdir, filename)
 
         retries = Retry(
@@ -207,20 +212,15 @@ class Item(object):
 
         r = session.get(
             url,
-            params={
-                "email": credential,
-                "item_id": self.id,
-                "collection": self.collection,
-            },
+            params={"email": credential},
             stream=True,
             allow_redirects=True,
         )
-        if r.status_code == 200:
+
+        if 200 <= r.status_code <= 299:
             with open(outfile, "wb") as f:
                 for ch in r.iter_content(chunk_size=4096):  # (page size 4Kb)
                     if ch:
                         f.write(ch)
-
-            return outfile
         else:
-            return "ERROR in " + url + " (" + r.reason + ")"
+            raise Exception(f"{r.status_code} - ERROR in {url}. Reason: {r.reason}")
