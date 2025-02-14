@@ -1,6 +1,6 @@
 [project]
 name = "cbers4asat"
-version = "0.8.2"
+version = "0.9.0"
 description = "Biblioteca Python para realizar a busca e processamento de imagens dos satélites CBERS-04A e AMAZONIA-1"
 authors = [
     { name = "Gabriel Russo", email = "gabrielrusso@protonmail.com" }]
@@ -19,7 +19,6 @@ classifiers = [
 dependencies = [
     "geopandas>=0.9",
     "requests>=2.25.1",
-    "pandas>=1.3.5"
 ]
 
 [project.optional-dependencies]
