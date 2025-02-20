@@ -5,7 +5,7 @@ from os.path import join
 from typing import Union
 
 # PyPi Packages
-from requests import Session
+from requests import Session, HTTPError
 
 # Local Modules
 from .collections import Collections
@@ -32,18 +32,24 @@ class SearchItem:
         features = list()
         with Session() as session:
             for id_ in self.search_item_body.ids:
-                response = session.get(
-                    join(
-                        self.BASE_URL_SEARCH_ITEM,
-                        self.search_item_body.collection,
-                        "items",
-                        id_,
+                try:
+                    response = session.get(
+                        join(
+                            self.BASE_URL_SEARCH_ITEM,
+                            self.search_item_body.collection,
+                            "items",
+                            id_,
+                        )
                     )
-                )
-                response.raise_for_status()
-                feature = response.json()
-                if feature.get("type") == "Feature":
-                    features.append(feature)
+                    response.raise_for_status()
+                    feature = response.json()
+                    if feature.get("type") == "Feature":
+                        features.append(feature)
+                except HTTPError as err:
+                    raise Exception(
+                        f"{response.status_code} - ERROR searching {id_}. Reason: {response.reason}. Exception: {err}"
+                    )
+
         return {"type": "FeatureCollection", "features": features}
 
     def ids(
@@ -79,22 +85,27 @@ class Search:
         """
         self.stac_request_body.providers.append(self.providers_body)
         with Session() as session:
-            response = session.post(
-                self.BASE_URL_SEARCH,
-                json=self.stac_request_body.as_dict(),
-            )
-            response.raise_for_status()
-            # Response Root Keys are the providers, like: "LGI-CDSR', "DATA-INPE"...
-            # Get the only provider that will be supported by cbers4asat lib.
-            collections = response.json()["LGI-CDSR"]
-            # Second level of keys are the collections, like "AMAZONIA1_WFI_L2_DN".
-            # Every collection will be grouped inside this variable bellow.
-            feature_collection = {"type": "FeatureCollection", "features": []}
-            # For every collection...
-            for name, content in collections.items():
-                # Append all collection features in one
-                feature_collection["features"].extend(content["features"])
-            return feature_collection
+            try:
+                response = session.post(
+                    self.BASE_URL_SEARCH,
+                    json=self.stac_request_body.as_dict(),
+                )
+                response.raise_for_status()
+                # Response Root Keys are the providers, like: "LGI-CDSR', "DATA-INPE"...
+                # Get the only provider that will be supported by cbers4asat lib.
+                collections = response.json()["LGI-CDSR"]
+                # Second level of keys are the collections, like "AMAZONIA1_WFI_L2_DN".
+                # Every collection will be grouped inside this variable bellow.
+                feature_collection = {"type": "FeatureCollection", "features": []}
+                # For every collection...
+                for name, content in collections.items():
+                    # Append all collection features in one
+                    feature_collection["features"].extend(content["features"])
+                return feature_collection
+            except HTTPError as err:
+                raise Exception(
+                    f"{response.status_code} - ERROR in query. Reason: {response.reason}. Exception: {err}"
+                )
 
     def bbox(self, bbox: list[float]) -> None | Exception:
         """
