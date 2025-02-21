@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 # Standard Libraries
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 
 # Local Modules
 from .item import Item
+from .utils.dataclass import ignore_extras
 
 
+@ignore_extras
 @dataclass
 class ItemCollection:
     """
@@ -26,3 +28,6 @@ class ItemCollection:
     def get_features_assets(self):
         for feature in self.features:
             feature.get_assets()
+
+    def as_dict(self) -> dict:
+        return asdict(self).copy()

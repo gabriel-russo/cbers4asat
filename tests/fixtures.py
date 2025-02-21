@@ -1,8 +1,8 @@
-from rasterio import open as rasterio_open
-import pytest
-from pathlib import Path
 from os import remove
+from pathlib import Path
+import pytest
 from cbers4asat.tools import read_geojson
+from rasterio import open as rasterio_open
 
 FIXTURE_DIR = Path(__file__).parent.resolve() / "data"
 

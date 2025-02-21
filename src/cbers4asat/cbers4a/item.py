@@ -1,31 +1,11 @@
 # -*- coding: utf-8 -*-
 # Standard Libraries
-from dataclasses import dataclass
-from os.path import join, basename
+from dataclasses import dataclass, asdict
 from typing import Union, Optional
-
-# PyPi Packages
-from requests import Session, HTTPError
-from requests.adapters import HTTPAdapter
-from urllib3.util import Retry
 
 # Local Modules
 from .search import SearchItem
-
-
-def ignore_extras(cls):
-    """
-    Ignore extra fields in dataclass decorator.
-    """
-    __original__init__ = cls.__init__
-
-    def filter(self, **kwargs):
-        __original__init__(
-            self, **{k: v for k, v in kwargs.items() if k in self.__annotations__}
-        )
-
-    cls.__init__ = filter
-    return cls
+from .utils.dataclass import ignore_extras
 
 
 @ignore_extras
@@ -99,57 +79,28 @@ class Item:
         if isinstance(self.assets, dict):
             self.assets = Assets(**self.assets)
 
+    @staticmethod
+    def from_search(_id: str, collection: str):
+        search = SearchItem()
+        search.ids(
+            list([_id]),
+            collection=collection,
+        )
+        return Item(**search().get("features")[0])
+
     def get_assets(self):
         """
         docstring
         """
-        search = SearchItem()
-        search.ids(
-            list([self.id]),
-            collection=self.collection,
-        )
-        self.assets = Item(**search().get("features")[0]).assets
+        self.assets = Item.from_search(self.id, self.collection).assets
 
-    def download(self, band: str, credential: str, outdir: str) -> None | Exception:
-        """
-        Download the asset.
-        """
-        asset: Asset = getattr(self.assets, band, None)
+    def has_band(self, band: str) -> bool:
+        return getattr(self.assets, band, None) is not None
 
-        if not asset:
-            raise Exception(f"Band {band} does not exist in this asset!")
+    def band_url(self, band: str) -> str:
+        if not self.has_band(band):
+            raise Exception(f"Band {band} does not exist in this item!")
+        return getattr(self.assets, band, None).href
 
-        url = asset.href
-
-        filename = basename(url)
-        outfile = join(outdir, filename)
-
-        retries = Retry(
-            total=3,
-            connect=3,
-            read=3,
-            status=3,
-            other=3,
-            backoff_factor=1,
-            status_forcelist=[500, 501, 502, 503, 504],
-            allowed_methods={"GET"},
-        )
-
-        with Session() as session:
-            session.mount("http://", HTTPAdapter(max_retries=retries))
-            try:
-                response = session.get(
-                    url,
-                    params={"email": credential},
-                    stream=True,
-                    allow_redirects=True,
-                )
-                response.raise_for_status()
-                with open(outfile, "wb") as f:
-                    for chunk in response.iter_content(chunk_size=4096):
-                        if chunk:
-                            f.write(chunk)
-            except HTTPError as err:
-                raise Exception(
-                    f"{response.status_code} - ERROR in {url}. Reason: {response.reason}. Exception: {err}"
-                )
+    def as_dict(self) -> dict:
+        return asdict(self).copy()

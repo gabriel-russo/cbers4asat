@@ -1,3 +1,6 @@
+from os import remove
+from pathlib import Path
+import pytest
 from cbers4asat.tools import (
     rgbn_composite,
     grid_download,
@@ -6,6 +9,7 @@ from cbers4asat.tools import (
     read_geojson,
 )
 from rasterio import open as rasterio_open
+from shapely.geometry import Polygon
 from fixtures import (
     rgb_assert_metadata,
     pansharp_assert_metadata,
@@ -13,10 +17,6 @@ from fixtures import (
     crop_assert_metadata,
     crop_geojson_mask,
 )
-from os import remove
-import pytest
-from pathlib import Path
-from shapely.geometry import Polygon
 
 FIXTURE_DIR = Path(__file__).parent.resolve() / "data"
 

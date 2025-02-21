@@ -1,152 +1,28 @@
-from cbers4asat import Cbers4aAPI
-import pytest
+# -*- coding: utf-8 -*-
 from datetime import date
 from os import remove
+import pytest
+from cbers4asat import Cbers4aAPI
 from shapely.geometry import Polygon
-
-
-class MockStacFeatureCollectionResponse:
-    def __init__(self):
-        self.status_code = 200
-
-    def raise_for_status(self):
-        pass
-
-    @staticmethod
-    def iter_content(chunk_size):
-        yield b"dummydata"
-
-    @staticmethod
-    def json():
-        return {
-            "LGI-CDSR": {
-                "Collection_A": {
-                    "type": "FeatureCollection",
-                    "features": [
-                        {
-                            "type": "Feature",
-                            "id": "ABC123",
-                            "collection": "y",
-                            "geometry": {
-                                "type": "Polygon",
-                                "coordinates": [
-                                    [
-                                        [-48.3106, -15.3637],
-                                        [-48.3106, -16.4178],
-                                        [-47.2492, -16.4178],
-                                        [-47.2492, -15.3637],
-                                        [-48.3106, -15.3637],
-                                    ]
-                                ],
-                            },
-                            "bbox": [-48.3106, -16.4178, -47.2492, -15.3637],
-                            "properties": {"x": "XYZ"},
-                            "assets": {
-                                "thumbnail": {"href": "http://test.dev/thumbnail.png"},
-                            },
-                        }
-                    ],
-                },
-            }
-        }
-
-
-class MockStacFeatureResponse:
-    def __init__(self):
-        self.status_code = 200
-
-    def raise_for_status(self):
-        pass
-
-    @staticmethod
-    def iter_content(chunk_size):
-        yield b"dummydata"
-
-    @staticmethod
-    def json():
-        return {
-            "type": "Feature",
-            "id": "ABC123",
-            "collection": "y",
-            "geometry": {
-                "type": "Polygon",
-                "coordinates": [
-                    [
-                        [-48.3106, -15.3637],
-                        [-48.3106, -16.4178],
-                        [-47.2492, -16.4178],
-                        [-47.2492, -15.3637],
-                        [-48.3106, -15.3637],
-                    ]
-                ],
-            },
-            "bbox": [-48.3106, -16.4178, -47.2492, -15.3637],
-            "properties": {"x": "XYZ"},
-            "assets": {
-                "blue": {"href": "http://test.dev/image.tif"},
-                "thumbnail": {"href": "http://test.dev/thumbnail.png"},
-            },
-            "links": [{"x": "y"}],
-        }
+from mocks import (
+    MockStacFeatureCollectionResponse,
+    MockStacFeatureResponse,
+    feature_without_bands,
+    feature_with_bands,
+)
 
 
 class TestCbers4aAPI:
     api = Cbers4aAPI("test@test.com")
-    expected_result_lookup = {
+
+    expected_result_from_query = {
         "type": "FeatureCollection",
-        "features": [
-            {
-                "type": "Feature",
-                "id": "ABC123",
-                "collection": "y",
-                "geometry": {
-                    "type": "Polygon",
-                    "coordinates": [
-                        [
-                            [-48.3106, -15.3637],
-                            [-48.3106, -16.4178],
-                            [-47.2492, -16.4178],
-                            [-47.2492, -15.3637],
-                            [-48.3106, -15.3637],
-                        ]
-                    ],
-                },
-                "bbox": [-48.3106, -16.4178, -47.2492, -15.3637],
-                "properties": {"x": "XYZ"},
-                "assets": {
-                    "thumbnail": {"href": "http://test.dev/thumbnail.png"},
-                },
-            }
-        ],
+        "features": [feature_without_bands],
     }
 
-    expected_result_query = {
+    expected_result_after_query_item_assets = {
         "type": "FeatureCollection",
-        "features": [
-            {
-                "type": "Feature",
-                "id": "ABC123",
-                "collection": "y",
-                "geometry": {
-                    "type": "Polygon",
-                    "coordinates": [
-                        [
-                            [-48.3106, -15.3637],
-                            [-48.3106, -16.4178],
-                            [-47.2492, -16.4178],
-                            [-47.2492, -15.3637],
-                            [-48.3106, -15.3637],
-                        ]
-                    ],
-                },
-                "bbox": [-48.3106, -16.4178, -47.2492, -15.3637],
-                "properties": {"x": "XYZ"},
-                "assets": {
-                    "blue": {"href": "http://test.dev/image.tif"},
-                    "thumbnail": {"href": "http://test.dev/thumbnail.png"},
-                },
-            }
-        ],
+        "features": [feature_with_bands],
     }
 
     def test_user(self):
@@ -171,7 +47,7 @@ class TestCbers4aAPI:
             collections=["CBERS4A_WPM_L4_DN"],
         )
 
-        assert self.expected_result_lookup == result
+        assert self.expected_result_from_query == result
 
     def test_query_geometry(self, monkeypatch):
         def mock_post(*args, **kwargs):
@@ -188,8 +64,6 @@ class TestCbers4aAPI:
             ]
         )
 
-        assert bbox.is_valid
-
         result = self.api.query(
             location=bbox,
             initial_date=date(2021, 1, 1),
@@ -199,7 +73,23 @@ class TestCbers4aAPI:
             collections=["CBERS4A_WPM_L4_DN"],
         )
 
-        assert self.expected_result_lookup == result
+        assert self.expected_result_from_query == result
+
+    def test_query_pathrow(self, monkeypatch):
+        def mock_post(*args, **kwargs):
+            return MockStacFeatureCollectionResponse()
+
+        monkeypatch.setattr("requests.Session.post", mock_post)
+        result = self.api.query(
+            location=(206, 133),
+            initial_date=date(2021, 1, 1),
+            end_date=date(2021, 2, 1),
+            cloud=100,
+            limit=1,
+            collections=["CBERS4A_WPM_L4_DN"],
+        )
+
+        assert self.expected_result_from_query == result
 
     def test_query_by_id_str(self, monkeypatch):
         def mock_get(*args, **kwargs):
@@ -209,7 +99,7 @@ class TestCbers4aAPI:
 
         result = self.api.query_by_id(scene_id="ABC123", collection="y")
 
-        assert self.expected_result_query == result
+        assert self.expected_result_after_query_item_assets == result
 
     def test_query_by_id_list(self, monkeypatch):
         def mock_get(*args, **kwargs):
@@ -219,10 +109,10 @@ class TestCbers4aAPI:
 
         result = self.api.query_by_id(scene_id=["ABC123"], collection="y")
 
-        assert self.expected_result_query == result
+        assert self.expected_result_after_query_item_assets == result
 
     def test_to_geodataframe(self):
-        gdf = self.api.to_geodataframe(self.expected_result_lookup)
+        gdf = self.api.to_geodataframe(self.expected_result_from_query)
         assert type(gdf).__name__ == "GeoDataFrame"
         assert gdf.crs == "EPSG:4326"
         assert len(gdf) == 1
@@ -230,26 +120,22 @@ class TestCbers4aAPI:
     def test_missing_credentials_exception(self):
         with pytest.raises(Exception):
             api = Cbers4aAPI("")
-            api.download(self.expected_result_lookup, bands=["blue"])
+            api.download(self.expected_result_from_query, bands=["blue"])
 
     def test_missing_credentials_exception_geodataframe(self):
         with pytest.raises(Exception):
             api = Cbers4aAPI("")
-            gdf = api.to_geodataframe(self.expected_result_lookup)
+            gdf = api.to_geodataframe(self.expected_result_from_query)
             api.download(gdf, bands=["blue"])
 
     def test_download(self, monkeypatch, tmp_path):
-        def mock_post(*args, **kwargs):
-            return MockStacFeatureCollectionResponse()
-
         def mock_get(*args, **kwargs):
             return MockStacFeatureResponse()
 
-        monkeypatch.setattr("requests.Session.post", mock_post)
         monkeypatch.setattr("requests.Session.get", mock_get)
 
         self.api.download(
-            products=self.expected_result_lookup,
+            products=self.expected_result_from_query,
             bands=["blue"],
             threads=1,
             outdir=tmp_path.as_posix(),
@@ -262,16 +148,12 @@ class TestCbers4aAPI:
         remove(f"{tmp_path.as_posix()}/ABC123/image.tif")
 
     def test_download_gdf(self, monkeypatch, tmp_path):
-        def mock_post(*args, **kwargs):
-            return MockStacFeatureCollectionResponse()
-
         def mock_get(*args, **kwargs):
             return MockStacFeatureResponse()
 
-        monkeypatch.setattr("requests.Session.post", mock_post)
         monkeypatch.setattr("requests.Session.get", mock_get)
 
-        gdf = self.api.to_geodataframe(self.expected_result_lookup)
+        gdf = self.api.to_geodataframe(self.expected_result_from_query)
 
         self.api.download(
             products=gdf,

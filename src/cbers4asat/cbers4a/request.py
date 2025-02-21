@@ -71,7 +71,7 @@ class STACRequestBody:
     Represents the STAC API request. This object will be send inside POST request body to INPE STAC API.
     """
 
-    bbox: list[float] = None
+    bbox: list[float] = field(default_factory=lambda: [-81, -37, -30, 11])
     datetime: str = None
     fromCatalog: str = field(default="yes")
     limit: int = 100
