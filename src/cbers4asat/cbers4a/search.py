@@ -93,12 +93,22 @@ class Search:
                 response.raise_for_status()
                 # Response Root Keys are the providers, like: "LGI-CDSR', "DATA-INPE"...
                 # Get the only provider that will be supported by cbers4asat lib.
-                collections = response.json()["LGI-CDSR"]
+                collections = response.json().get("LGI-CDSR", None)
                 # Second level of keys are the collections, like "AMAZONIA1_WFI_L2_DN".
                 # Every collection will be grouped inside this variable bellow.
                 feature_collection = {"type": "FeatureCollection", "features": []}
+
+                if not collections:
+                    return feature_collection
+
                 # For every collection...
                 for name, content in collections.items():
+                    if not isinstance(content, dict):
+                        continue
+
+                    if not content.get("features", None):
+                        continue
+
                     # Append all collection features in one
                     feature_collection["features"].extend(content["features"])
                 return feature_collection

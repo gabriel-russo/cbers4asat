@@ -27,7 +27,7 @@ class Cbers4aAPI:
     The CBERS4A API class. Query, download or transform data from CBERS4A STAC API.
     """
 
-    def __init__(self, user: str):
+    def __init__(self, user: str = ""):
         self._user = user
 
     @property
@@ -154,7 +154,9 @@ class Cbers4aAPI:
 
         with ThreadPoolExecutor(max_workers=threads) as t_pool:
             for task in tasks:
-                t_pool.submit(*task)
+                f = t_pool.submit(*task)
+                if f.exception():
+                    raise f.exception()
 
     def __download_gdf(
         self,
@@ -183,7 +185,9 @@ class Cbers4aAPI:
 
         with ThreadPoolExecutor(max_workers=threads) as t_pool:
             for task in tasks:
-                t_pool.submit(*task)
+                f = t_pool.submit(*task)
+                if f.exception():
+                    raise f.exception()
 
     def download(
         self,
@@ -236,6 +240,9 @@ class Cbers4aAPI:
         Returns:
             GeoDataFrame of products.
         """
+        if not products or not isinstance(products, dict):
+            raise Exception("Provide a valid product structure.")
+
         item_collection = ItemCollection(**products)
         processed = list()
         for item in item_collection:
