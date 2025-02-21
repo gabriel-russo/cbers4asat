@@ -62,10 +62,10 @@ class TestTools:
 
         grid_download(satellite="amazonia1", sensor="wfi", outdir=tmp_path.as_posix())
 
-        with open(f"{tmp_path.as_posix()}/grid_amazonia1_wfi_sa.zip", "rb") as f:
+        with open(f"{tmp_path.as_posix()}/grid_amazonia1_wfi_sa.kmz", "rb") as f:
             assert f.read() == b"dummydata"
 
-        remove(f"{tmp_path.as_posix()}/grid_amazonia1_wfi_sa.zip")
+        remove(f"{tmp_path.as_posix()}/grid_amazonia1_wfi_sa.kmz")
 
     @pytest.mark.datafiles(
         FIXTURE_DIR / "MULTISPECTRAL.tif",
