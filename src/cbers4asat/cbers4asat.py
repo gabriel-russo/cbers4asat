@@ -1,17 +1,33 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# Standard Libraries
 from concurrent.futures import ThreadPoolExecutor
 from datetime import date
-from os import getcwd, cpu_count, makedirs
+from os import getcwd, cpu_count
 from os.path import isdir, join
-from typing import List, overload, Dict, Union
+from typing import List, Dict, Union
+
+# PyPi Packages
 from geopandas import GeoDataFrame
+from pandas import concat
 from shapely.geometry import Polygon
-from .cbers4a import Search, ItemCollection
+
+# Local Modules
+from .cbers4a import (
+    Search,
+    Download,
+    SearchItem,
+    ItemCollection,
+    Item,
+    Collections,
+)
 
 
 class Cbers4aAPI:
-    def __init__(self, user: str):
+    """
+    The CBERS4A API class. Query, download or transform data from CBERS4A STAC API.
+    """
+
+    def __init__(self, user: str = ""):
         self._user = user
 
     @property
@@ -24,72 +40,74 @@ class Cbers4aAPI:
 
     @staticmethod
     def query(
-        *,
-        location: Union[List[float], Polygon],
+        location: Union[list[float], Polygon, tuple],
         initial_date: date,
         end_date: date,
         cloud: int,
         limit: int,
-        collections: List[str] = None,
-    ):
+        collections: Union[list[str], list[Collections]],
+    ) -> dict:
         """
         Query Images from INPE's catalog
 
         Args:
-            location: Bounding box or Path Row
+            location: Bounding box, Polygon shape or Path and Row Tuple
             initial_date: Images from this date
             end_date: Images to this date
-            cloud: Percentage of clouds
+            cloud: Percentage of cloud coverage
             limit: Limit of returned images
             collections: Collection's name(s)
-
         Notes:
             Location:
                 - Bounding box: `location=[-0.5, 1.0, 0.5, -0.5]`
+                - Polygon shape from shapely
                 - Path and row respectively: `location=(225,75)`
             Initial and end dates:
                 - Use date object from datetime library: `datetime.date(2021,05,25)`
                 - Caution to end date always be bigger than initial date
                 - e.g. `initial_date=datetime.date(2021,08,15)`
             Cloud coverage:
-                - Search for scenes below certain cloud coverage percentage
+                - Search for scenes less or equal (<=) cloud coverage percentage.
                 - e.g. `cloud=70`
+                - Must be between 0 and 100.
             Limit:
-                - Max value of returned features is 1000
-                - e.g. `limit=500`
+                - Values greater than 0.
+                - e.g. `limit=500`.
             Collections:
-                - Available collections from INPE catalog <http://www2.dgi.inpe.br/catalogo/explore>
+                - Use the collections enum via `from cbers4asat import Collections as col`
+                - Available collections from INPE catalog <https://www.dgi.inpe.br/catalogo/explore>
                 - Always an array of collections name.
-                - e.g. `['AMAZONIA1_WFI_L2_DN']` or `['AMAZONIA1_WFI_L2_DN', 'CBERS4A_WPM_L4_DN']` etc.
+                - e.g. `[col.AMAZONIA1_WFI_L2_DN]` or `[col.AMAZONIA1_WFI_L2_DN, col.CBERS4A_WPM_L4_DN]` etc.
 
         Returns:
             dict: Dict with GeoJSON-like format
-
+        Raises:
+            Exception: If any input is invalid.
         """
         search = Search()
-
-        if not location:
-            raise Exception("Location cannot be empty")
 
         if isinstance(location, list):
             search.bbox(location)
         elif isinstance(location, Polygon):
             search.bbox(list(location.bounds))
+        elif isinstance(location, tuple):
+            search.path_row(*location)
         else:
-            raise Exception("Provide a bbox or Polygon")
+            raise Exception(
+                "Provide a Bouding box, Polygon shape or path and row tuple"
+            )
 
-        search.date(initial_date.isoformat(), end_date.isoformat())
-        search.cloud_cover("<=", cloud)
+        search.date_interval(initial_date, end_date)
+        search.cloud_cover(cloud)
         search.limit(limit)
+        search.collections(collections)
 
-        if collections is not None:
-            search.collections(collections)
-
-        result = search()
-        return result.featurescollection
+        return search()
 
     @staticmethod
-    def query_by_id(scene_id: Union[str, List[str]], collection: str = None):
+    def query_by_id(
+        scene_id: Union[List[str], str], collection: Union[str, Collections]
+    ):
         """
         Search a product by id
 
@@ -99,44 +117,12 @@ class Cbers4aAPI:
         Returns:
             dict: Dict with GeoJSON-like format
         """
-        search = Search()
-
-        if not scene_id:
-            raise Exception("Especify an id")
-        elif not collection:
-            raise Exception("Especify a collection")
-
-        # search() method only works with a list of ids.
-        if type(scene_id) is not list:
-            search.ids([scene_id])
-        else:
-            search.ids(scene_id)
-
-        search.collections(collection)
-
-        result = search()
-        return result.featurescollection
-
-    # AUXILIARY -------Description------------------
-    #
-    # _check_for_exception -> Private method specialized to check for file and folders and mistakes
-    # ----------------------------------------------
-
-    def __check_for_exception(self, product, bands, outdir):
-        """Search for exceptions block: empty product, empty bands, output dir does not exist"""
-
-        # Check for empty products in different contexts
-        if isinstance(product, Dict):
-            if not product:  # Check if dictionary is empty
-                raise TypeError("No product to download")
-        elif isinstance(product, GeoDataFrame):
-            if product.empty:  # Check if data frame is empty
-                raise TypeError("No product to download")
-        # ---
-        if not bands or bands == [""]:
-            raise TypeError("Choose bands to download")
-        elif not isdir(outdir):
-            raise NotADirectoryError("Choose a valid output directory")
+        search = SearchItem()
+        search.ids(
+            scene_id if isinstance(scene_id, list) else list([scene_id]),
+            collection=collection,
+        )
+        return search()
 
     def __download(
         self,
@@ -146,31 +132,31 @@ class Cbers4aAPI:
         outdir: str = getcwd(),
         with_folder: bool = False,
     ):
-        self.__check_for_exception(products, bands, outdir)
+        try:
+            products = ItemCollection(**products)
+        except TypeError:
+            raise Exception(
+                "Check your product structure. It must be a GeoJSON like dictionary."
+            )
 
-        products_search_list = ItemCollection(products).items()
+        products.get_features_assets()
 
-        with ThreadPoolExecutor(
-            max_workers=threads, thread_name_prefix="cbers4a"
-        ) as pool:
-            if not self.user:
-                raise Exception("Credentials not provided!")
-
+        tasks = list()
+        root = outdir
+        for product in products:
             if with_folder:
-                root = outdir  # Save the outdir start point (to looks like a pushd and popd)
+                outdir = join(root, product.id)
 
-            for product_lookup in products_search_list:
-                products_query = self.query_by_id(
-                    product_lookup.id, product_lookup.collection
+            for band in bands:
+                tasks.append(
+                    (Download().download, product.band_url(band), self.user, outdir)
                 )
-                product_metadata = ItemCollection(products_query).items()
-                for product in product_metadata:
-                    if with_folder:
-                        new_path = join(root, product.id)
-                        makedirs(new_path, exist_ok=True)
-                        outdir = new_path
-                    for band in bands:
-                        pool.submit(product.download, band, self.user, outdir)
+
+        with ThreadPoolExecutor(max_workers=threads) as t_pool:
+            for task in tasks:
+                f = t_pool.submit(*task)
+                if f.exception():
+                    raise f.exception()
 
     def __download_gdf(
         self,
@@ -180,57 +166,35 @@ class Cbers4aAPI:
         outdir: str = getcwd(),
         with_folder: bool = False,
     ):
-        self.__check_for_exception(products, bands, outdir)
+        features = list()
+        for index, row in products.iterrows():
+            features.append(Item.from_search(row.id, row.collection))
 
-        with ThreadPoolExecutor(
-            max_workers=threads, thread_name_prefix="cbers4a_gdf"
-        ) as pool:
-            if not self.user:
-                raise Exception("Credentials not provided!")
+        # GeoDataFrame is not needed anymore
+        products = ItemCollection(type="FeatureCollection", features=features)
 
+        tasks = list()
+        root = outdir
+        for product in products:
             if with_folder:
-                root = outdir  # Save the outdir start point (to looks like a pushd and popd)
+                outdir = join(root, product.id)
+            for band in bands:
+                tasks.append(
+                    (Download().download, product.band_url(band), self.user, outdir)
+                )
 
-            for index, row in products.iterrows():
-                if with_folder:
-                    new_path = join(root, str(index))
-                    makedirs(new_path, exist_ok=True)
-                    outdir = new_path
+        with ThreadPoolExecutor(max_workers=threads) as t_pool:
+            for task in tasks:
+                f = t_pool.submit(*task)
+                if f.exception():
+                    raise f.exception()
 
-                products_query = self.query_by_id(str(index), row.collection)
-                products_query = ItemCollection(products_query).items()
-                for product in products_query:
-                    for band in bands:
-                        pool.submit(product.download, band, self.user, outdir)
-
-    @overload
     def download(
         self,
-        products: Dict,
-        bands: List[str],
+        products: Union[dict, GeoDataFrame],
+        bands: list[str],
         threads: int = cpu_count(),
         outdir: str = getcwd(),
-        with_folder: bool = False,
-    ):
-        pass
-
-    @overload
-    def download(
-        self,
-        products: GeoDataFrame,
-        bands: List[str],
-        threads: int = cpu_count(),
-        outdir: str = getcwd(),
-        with_folder: bool = False,
-    ):
-        pass
-
-    def download(
-        self,
-        products,
-        bands,
-        threads=cpu_count(),
-        outdir=getcwd(),
         with_folder: bool = False,
     ):
         """
@@ -238,7 +202,7 @@ class Cbers4aAPI:
 
         Args:
             products: Data returned from API
-            bands: List of band color's name
+            bands: List of band color's name. "red", "green", "blue", "nir", "pan"
             threads: Max of cpu threads
             outdir: Output path
             with_folder: Group scene bands in a sub folder
@@ -248,40 +212,56 @@ class Cbers4aAPI:
         Returns:
             GeoTIFF files
         """
+        if not len(bands):
+            raise TypeError("Choose bands to download.")
+        elif not isdir(outdir):
+            raise NotADirectoryError("Choose a valid output directory.")
+        elif not self.user:
+            raise Exception("Credentials not provided!")
+
         if isinstance(products, dict):
+            if not products:  # Check if dictionary is empty
+                raise Exception("No product to download.")
             return self.__download(products, bands, threads, outdir, with_folder)
         elif isinstance(products, GeoDataFrame):
+            if products.empty:  # Check if data frame is empty
+                raise Exception("No product to download.")
             return self.__download_gdf(products, bands, threads, outdir, with_folder)
         else:
-            raise TypeError("Bad Arguments")
+            raise Exception("Bad Arguments.")
 
     @staticmethod
-    def to_geodataframe(products: Dict, crs: str = "EPSG:4326"):
+    def to_geodataframe(products: dict) -> GeoDataFrame:
         """
         Transform products list to a GeoDataFrame
 
         Args:
             products: GeoJSON-like dictionary returned from API
-            crs: Coordinate Reference System (ex: EPSG:4326)
         Returns:
-            GeoDataFrame
+            GeoDataFrame of products.
         """
-        items = [feat for feat in ItemCollection(products).items()]
+        if not products or not isinstance(products, dict):
+            raise Exception("Provide a valid product structure.")
 
-        for item in items:
-            item_metadata = {}
-            item_metadata.update(id=item.id)
-            item_metadata.update(bbox=item.bbox)
-            item_metadata.update(collection=item.collection)
-            item_metadata.update(thumbnail=item.thumbnail)
-            item_metadata.update(
-                urls=[{asset: item.url(asset)} for asset in item.assets]
+        item_collection = ItemCollection(**products)
+        processed = list()
+        for item in item_collection:
+            extras = {
+                "properties": {
+                    **item.properties.asdict(),
+                    "id": item.id,
+                    "bbox": item.bbox,
+                    "collection": item.collection,
+                    "thumbnail": item.assets.thumbnail.href,
+                }
+            }
+            gdf = GeoDataFrame.from_features(
+                {
+                    "type": "FeatureCollection",
+                    "features": [item.asdict() | extras],
+                },
+                crs="EPSG:4326",
             )
+            processed.append(gdf)
 
-            for index, feature in enumerate(products.get("features")):
-                if feature["id"] == item.id:
-                    products.get("features")[index].get("properties").update(
-                        **item_metadata
-                    )
-
-        return GeoDataFrame.from_features(products, crs=crs).set_index("id")
+        return concat(processed, ignore_index=True).set_index("id", drop=False)

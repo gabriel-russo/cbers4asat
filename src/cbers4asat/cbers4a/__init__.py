@@ -1,5 +1,6 @@
 # flake8: noqa
+from .collections import Collections
+from .download import Download
 from .item import Item
 from .itemCollection import ItemCollection
-from .collection import Collections
-from .search import Search
+from .search import Search, SearchItem

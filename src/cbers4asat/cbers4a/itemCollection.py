@@ -1,101 +1,49 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# Standard Libraries
+from dataclasses import dataclass
+from typing import Iterable
 
+# Local Modules
 from .item import Item
+from .utils.dataclass import ignore_extras, SerializationCapabilities
 
 
-class ItemCollection(object):
-    """Class to parse json from INPE STAC Catalog"""
+@ignore_extras
+@dataclass
+class ItemCollection(SerializationCapabilities):
+    """
+    Class to parse GeoJSON from INPE STAC Catalog
+    """
 
-    def __init__(self, data):
-        self._data = data
+    type: str
+    features: list[Item]
 
-    @property
-    def returned(self):
-        return self._data["context"]["returned"]
+    def __post_init__(self):
+        if len(self.features):
+            theres_a_dict = any(map(lambda f: isinstance(f, dict), self.features))
 
-    @property
-    def matched(self):
-        return self._data["context"]["matched"]
+            if theres_a_dict:  # If there's a dict, do conversion to Item object.
+                items = list()
+                for feature in self.features:
+                    if isinstance(feature, dict):
+                        items.append(Item(**feature))
+                    elif isinstance(feature, Item):
+                        items.append(feature)
+                    else:
+                        raise TypeError(f"{feature} is an invalid feature type!")
 
-    @property
-    def limit(self):
-        return self._data["context"]["limit"]
+                self.features = items.copy()
 
-    @property
-    def complete(self):
-        return self._data["context"]["returned"] == self._data["context"]["matched"]
-
-    @property
-    def featurescollection(
-        self,
-    ):  # FeaturesCollection GeoJSON ? ['type', 'id', 'geometry', 'bbox', 'properties']
-        return {
-            "type": "FeatureCollection",
-            "features": list(
-                self.features(
-                    "type",
-                    "id",
-                    "collection",
-                    "geometry",
-                    "bbox",
-                    "properties",
-                    "assets",
-                )
-            ),
-        }
-
-    def items(self):
-        for feat in self._data["features"]:
-            yield Item(feat)
-
-    def features(self, *keys):
-        keys = list(
-            filter(
-                lambda k: k
-                in [
-                    "type",
-                    "id",
-                    "collection",
-                    "geometry",
-                    "bbox",
-                    "properties",
-                    "assets",
-                    "links",
-                ],
-                keys,
-            )
-        )
-        if keys:
-            for feat in self._data["features"]:
-                yield {key: feat[key] for key in keys}
-        else:
-            for feat in self._data["features"]:
-                yield feat
-
-    def __len__(self):
-        return self._data["context"]["returned"]
-
-    def __getitem__(self, k):
+    def __iter__(self) -> Iterable[Item]:
         """
         docstring
         """
-        try:
-            return Item(next(filter(lambda i: i["id"] == k, self._data["features"])))
-        except StopIteration:
-            raise KeyError(k)
+        for feature in self.features:
+            yield feature
 
-    def __contains__(self, k):
+    def get_features_assets(self) -> None:
         """
         docstring
         """
-        if isinstance(k, Item):
-            return any(i["id"] == k.id for i in self._data["features"])
-        else:
-            return any(i["id"] == k for i in self._data["features"])
-
-    def __iter__(self):
-        """
-        docstring
-        """
-        return self.items()
+        for feature in self.features:
+            feature.get_assets()
