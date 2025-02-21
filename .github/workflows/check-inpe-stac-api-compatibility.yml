@@ -6,7 +6,7 @@ on:
     - cron: "0 0 * * *"
 
 jobs:
-  test:
+  check-compatibility:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -17,14 +17,14 @@ jobs:
 
           python3 -c \
           'from cbers4asat import Cbers4aAPI;\
-          api = Cbers4aAPI();\
+          api = Cbers4aAPI("yolo");\
           p = api.query_by_id(scene_id="CBERS4A_WPM22912420210830", collection="CBERS4A_WPM_L4_DN");\
           print(p)'
 
           python3 -c \
           'from cbers4asat import Cbers4aAPI;\
           from datetime import date;\
-          api = Cbers4aAPI();\
+          api = Cbers4aAPI("yolo");\
           p = api.query(location=(229, 124),\
                initial_date=date(2023, 8, 25),\
                end_date=date.today(),\
