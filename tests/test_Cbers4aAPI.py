@@ -2,7 +2,7 @@
 from datetime import date
 from os import remove
 import pytest
-from cbers4asat import Cbers4aAPI
+from cbers4asat import Cbers4aAPI, Collections as col
 from shapely.geometry import Polygon
 from mocks import (
     MockStacFeatureCollectionResponse,
@@ -80,6 +80,7 @@ class TestCbers4aAPI:
             return MockStacFeatureCollectionResponse()
 
         monkeypatch.setattr("requests.Session.post", mock_post)
+
         result = self.api.query(
             location=(206, 133),
             initial_date=date(2021, 1, 1),
@@ -87,6 +88,40 @@ class TestCbers4aAPI:
             cloud=100,
             limit=1,
             collections=["CBERS4A_WPM_L4_DN"],
+        )
+
+        assert self.expected_result_from_query == result
+
+    def test_query_collections_with_enum(self, monkeypatch):
+        def mock_post(*args, **kwargs):
+            return MockStacFeatureCollectionResponse()
+
+        monkeypatch.setattr("requests.Session.post", mock_post)
+
+        result = self.api.query(
+            location=(206, 133),
+            initial_date=date(2021, 1, 1),
+            end_date=date(2021, 2, 1),
+            cloud=100,
+            limit=1,
+            collections=[col.CBERS4A_WPM_L4_DN, col.CBERS4A_WPM_L2_DN],
+        )
+
+        assert self.expected_result_from_query == result
+
+    def test_query_collections_mix(self, monkeypatch):
+        def mock_post(*args, **kwargs):
+            return MockStacFeatureCollectionResponse()
+
+        monkeypatch.setattr("requests.Session.post", mock_post)
+
+        result = self.api.query(
+            location=(206, 133),
+            initial_date=date(2021, 1, 1),
+            end_date=date(2021, 2, 1),
+            cloud=100,
+            limit=1,
+            collections=["CBERS4A_WPM_L4_DN", col.CBERS4A_WPM_L2_DN],
         )
 
         assert self.expected_result_from_query == result
@@ -113,6 +148,19 @@ class TestCbers4aAPI:
 
     def test_to_geodataframe(self):
         gdf = self.api.to_geodataframe(self.expected_result_from_query)
+
+        assert "id" in list(gdf.columns)
+        assert "geometry" in list(gdf.columns)
+        assert "datetime" in list(gdf.columns)
+        assert "path" in list(gdf.columns)
+        assert "row" in list(gdf.columns)
+        assert "satellite" in list(gdf.columns)
+        assert "sensor" in list(gdf.columns)
+        assert "cloud_cover" in list(gdf.columns)
+        assert "bbox" in list(gdf.columns)
+        assert "collection" in list(gdf.columns)
+        assert "thumbnail" in list(gdf.columns)
+
         assert type(gdf).__name__ == "GeoDataFrame"
         assert gdf.crs == "EPSG:4326"
         assert len(gdf) == 1

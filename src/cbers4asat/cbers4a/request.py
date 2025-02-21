@@ -28,9 +28,10 @@ to STAC API in Search class:
 }
 """
 
-from dataclasses import dataclass, field, asdict
-from typing import List, Optional, Union, Any
+from dataclasses import dataclass, field
+from typing import List, Optional, Union
 from .collections import Collections
+from .utils.dataclass import SerializationCapabilities
 
 
 @dataclass
@@ -66,7 +67,7 @@ class Providers:
 
 
 @dataclass
-class STACRequestBody:
+class STACRequestBody(SerializationCapabilities):
     """
     Represents the STAC API request. This object will be send inside POST request body to INPE STAC API.
     """
@@ -76,24 +77,6 @@ class STACRequestBody:
     fromCatalog: str = field(default="yes")
     limit: int = 100
     providers: List[Providers] = field(default_factory=list)
-
-    def __del_none(self, value: dict) -> list[dict] | dict[Any, dict] | dict:
-        """
-        Delete keys with the value None in a dictionary, recursively.
-        """
-        if isinstance(value, list):
-            return [self.__del_none(x) for x in value if x is not None]
-        elif isinstance(value, dict):
-            return {
-                key: self.__del_none(val)
-                for key, val in value.items()
-                if val is not None
-            }
-        else:
-            return value
-
-    def as_dict(self) -> dict:
-        return self.__del_none(asdict(self).copy())
 
 
 @dataclass

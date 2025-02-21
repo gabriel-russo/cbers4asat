@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # Standard Libraries
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 from typing import Union, Optional
 
 # Local Modules
 from .search import SearchItem
-from .utils.dataclass import ignore_extras
+from .utils.dataclass import SerializationCapabilities, ignore_extras
 
 
 @ignore_extras
@@ -17,7 +17,7 @@ class Geometry:
 
 @ignore_extras
 @dataclass
-class Properties:
+class Properties(SerializationCapabilities):
     datetime: str
     path: int
     row: int
@@ -60,8 +60,10 @@ class Assets:
 
 @ignore_extras
 @dataclass
-class Item:
-    """Class to parse items from INPE STAC Catalog"""
+class Item(SerializationCapabilities):
+    """
+    Class to parse items from INPE STAC Catalog
+    """
 
     type: str
     id: str
@@ -80,7 +82,10 @@ class Item:
             self.assets = Assets(**self.assets)
 
     @staticmethod
-    def from_search(_id: str, collection: str):
+    def from_search(_id: str, collection: str) -> "Item":
+        """
+        docstring
+        """
         search = SearchItem()
         search.ids(
             list([_id]),
@@ -88,19 +93,22 @@ class Item:
         )
         return Item(**search().get("features")[0])
 
-    def get_assets(self):
+    def get_assets(self) -> None:
         """
         docstring
         """
         self.assets = Item.from_search(self.id, self.collection).assets
 
     def has_band(self, band: str) -> bool:
+        """
+        docstring
+        """
         return getattr(self.assets, band, None) is not None
 
     def band_url(self, band: str) -> str:
+        """
+        docstring
+        """
         if not self.has_band(band):
             raise Exception(f"Band {band} does not exist in this item!")
         return getattr(self.assets, band, None).href
-
-    def as_dict(self) -> dict:
-        return asdict(self).copy()

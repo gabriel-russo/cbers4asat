@@ -88,7 +88,7 @@ class Search:
             try:
                 response = session.post(
                     self.BASE_URL_SEARCH,
-                    json=self.stac_request_body.as_dict(),
+                    json=self.stac_request_body.asdict(exclude_none=True),
                 )
                 response.raise_for_status()
                 # Response Root Keys are the providers, like: "LGI-CDSR', "DATA-INPE"...

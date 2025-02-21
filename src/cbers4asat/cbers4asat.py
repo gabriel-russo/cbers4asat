@@ -143,7 +143,7 @@ class Cbers4aAPI:
 
         tasks = list()
         root = outdir
-        for product in products.features:
+        for product in products:
             if with_folder:
                 outdir = join(root, product.id)
 
@@ -173,7 +173,7 @@ class Cbers4aAPI:
 
         tasks = list()
         root = outdir
-        for product in products.features:
+        for product in products:
             if with_folder:
                 outdir = join(root, product.id)
             for band in bands:
@@ -227,31 +227,31 @@ class Cbers4aAPI:
             raise Exception("Bad Arguments.")
 
     @staticmethod
-    def to_geodataframe(products: Dict):
+    def to_geodataframe(products: dict) -> GeoDataFrame:
         """
         Transform products list to a GeoDataFrame
 
         Args:
             products: GeoJSON-like dictionary returned from API
-            crs: Coordinate Reference System (ex: EPSG:4326)
         Returns:
-            GeoDataFrame
+            GeoDataFrame of products.
         """
         item_collection = ItemCollection(**products)
         processed = list()
-        for feature in item_collection.features:
+        for item in item_collection:
             extras = {
                 "properties": {
-                    "id": feature.id,
-                    "bbox": feature.bbox,
-                    "collection": feature.collection,
-                    "thumbnail": feature.assets.thumbnail.href,
+                    **item.properties.asdict(),
+                    "id": item.id,
+                    "bbox": item.bbox,
+                    "collection": item.collection,
+                    "thumbnail": item.assets.thumbnail.href,
                 }
             }
             gdf = GeoDataFrame.from_features(
                 {
                     "type": "FeatureCollection",
-                    "features": [feature.as_dict() | extras],
+                    "features": [item.asdict() | extras],
                 },
                 crs="EPSG:4326",
             )
