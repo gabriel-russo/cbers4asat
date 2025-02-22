@@ -1,18 +1,27 @@
 # Exemplos
 
-* [Projetos com o cbers4asat](#projetos-que-utilizam-a-biblioteca-cbers4asat)
-* [Buscando produtos com bounding box](#buscando-produtos-com-bounding-box)
-* [Buscando produtos com órbita e ponto](#buscando-produtos-com-orbita-e-ponto)
-* [Buscando produtos com geometria](#buscando-produtos-com-geometria)
-* [Buscando produto(s) por ID](#buscando-produtos-por-id)
-* [Download de produtos](#download-de-produtos)
-* [Converter coleção de produtos para GeoDataFrame](#converter-colecao-de-produtos-para-geodataframe)
-* [Download de produtos no GeoDataFrame ](#download-de-produtos-no-geodataframe)
-* [Empilhamento de bandas](#empilhamento-de-bandas)
-* [Pansharpening](#pansharpening)
-* [Download do grid do CBERS-04A ou AMAZONIA1](#download-do-grid-do-cbers4a-ou-amazonia1)
-* [Recortando raster com GeoJSON](#recortando-raster-a-partir-de-uma-mascara-geojson)
-* [Recortando raster com GeoDataFrame](#recortando-raster-a-partir-de-uma-mascara-geodataframe)
+<!-- TOC -->
+* [Exemplos](#exemplos)
+  * [Projetos que utilizam a biblioteca `cbers4asat`:](#projetos-que-utilizam-a-biblioteca-cbers4asat)
+    * [1 - Mosaico de imagens do Estado de Rondônia automatizado.](#1---mosaico-de-imagens-do-estado-de-rondônia-automatizado)
+    * [2 - Baixar a cena mais recente do Rio Madeira (RO), criar composição RGB e gerar XYZ tiles.](#2---baixar-a-cena-mais-recente-do-rio-madeira-ro-criar-composição-rgb-e-gerar-xyz-tiles)
+  * [Buscando produtos com Bounding Box](#buscando-produtos-com-bounding-box)
+  * [Buscando produtos com órbita e ponto](#buscando-produtos-com-órbita-e-ponto)
+  * [Buscando produtos com órbita e ponto utilizando o Enum Collections](#buscando-produtos-com-órbita-e-ponto-utilizando-o-enum-collections)
+  * [Buscando produtos com órbita e ponto utilizando strings e Enum Collections](#buscando-produtos-com-órbita-e-ponto-utilizando-strings-e-enum-collections)
+  * [Buscando produtos com geometria](#buscando-produtos-com-geometria)
+  * [Buscando produtos por ID](#buscando-produtos-por-id)
+  * [Download de produtos](#download-de-produtos)
+  * [Converter coleção de produtos para GeoDataFrame](#converter-coleção-de-produtos-para-geodataframe)
+  * [Download de produtos no GeoDataFrame](#download-de-produtos-no-geodataframe)
+  * [Empilhamento de bandas](#empilhamento-de-bandas)
+    * [Resultado](#resultado)
+  * [Pansharpening](#pansharpening)
+    * [Resultado](#resultado-1)
+  * [Download do grid do cbers4a ou amazonia1](#download-do-grid-do-cbers4a-ou-amazonia1)
+  * [Recortando raster a partir de uma máscara - GeoJSON](#recortando-raster-a-partir-de-uma-máscara---geojson)
+  * [Recortando raster a partir de uma máscara - GeoDataFrame](#recortando-raster-a-partir-de-uma-máscara---geodataframe)
+<!-- TOC -->
 
 ## Projetos que utilizam a biblioteca `cbers4asat`:
 > Caso você tenha um projeto que utiliza a biblioteca, faça um pull request modificando docs/examples.md ou me envie um 
@@ -24,7 +33,7 @@ email para adicioná-lo aqui. gabrielrusso@protonmail.com
 ### 2 - Baixar a cena mais recente do Rio Madeira (RO), criar composição RGB e gerar XYZ tiles.
  - [gabriel-russo/monitoramento-rio-madeira](https://github.com/gabriel-russo/monitoramento-rio-madeira)
 
-## Buscando produtos com Bounding Box:
+## Buscando produtos com Bounding Box
 
 ```python
 # Importar biblioteca do cbers4asat e datetime
@@ -61,7 +70,7 @@ print(produtos)
 # {'type': 'FeatureCollection', 'features': [{'type': 'Feature', 'id': 'AMAZONIA1_WFI03901620210911CB11', ...
 ```
 
-## Buscando produtos com órbita e ponto:
+## Buscando produtos com órbita e ponto
 
 ```python
 from cbers4asat import Cbers4aAPI
@@ -86,7 +95,57 @@ print(produtos)
 # {'type': 'FeatureCollection', 'features': [{'type': 'Feature', 'id': 'CBERS4A_WPM22912420210830', ...
 ```
 
-## Buscando produtos com geometria:
+## Buscando produtos com órbita e ponto utilizando o Enum Collections
+
+```python
+from cbers4asat import Cbers4aAPI, Collections as coll
+from datetime import date
+
+api = Cbers4aAPI("seu.login@email.com")
+
+path_row = (229, 124)
+
+data_inicial = date(2021, 8, 25)
+data_final = date(2021, 9, 25)
+
+produtos = api.query(
+    location=path_row,
+    initial_date=data_inicial,
+    end_date=data_final,
+    cloud=100,
+    limit=100,
+    collections=[coll.CBERS4A_WPM_L2_DN, coll.CBERS4A_WPM_L4_DN],
+)
+
+print(produtos)
+```
+
+## Buscando produtos com órbita e ponto utilizando strings e Enum Collections
+
+```python
+from cbers4asat import Cbers4aAPI, Collections as coll
+from datetime import date
+
+api = Cbers4aAPI("seu.login@email.com")
+
+path_row = (229, 124)
+
+data_inicial = date(2021, 8, 25)
+data_final = date(2021, 9, 25)
+
+produtos = api.query(
+    location=path_row,
+    initial_date=data_inicial,
+    end_date=data_final,
+    cloud=100,
+    limit=100,
+    collections=[coll.CBERS4A_WPM_L2_DN, "CBERS4A_WPM_L4_DN"],
+)
+
+print(produtos)
+```
+
+## Buscando produtos com geometria
 
 ```python
 from cbers4asat import Cbers4aAPI
@@ -147,7 +206,7 @@ print(produtos)
 
 ```
 
-## Download de produtos:
+## Download de produtos
 
 ```python
 from cbers4asat import Cbers4aAPI
@@ -183,7 +242,7 @@ api.download(products=produtos,
 # ++- CBERS_4A_WPM_20210830_229_124_L4_BAND1.tif
 ```
 
-## Converter coleção de produtos para GeoDataFrame:
+## Converter coleção de produtos para GeoDataFrame
 
 ```python
 from cbers4asat import Cbers4aAPI
@@ -210,7 +269,7 @@ gdf = api.to_geodataframe(produtos, 'EPSG:4674')
 print(gdf.to_string())
 ```
 
-## Download de produtos no GeoDataFrame:
+## Download de produtos no GeoDataFrame
 
 ```python
 from cbers4asat import Cbers4aAPI
@@ -275,9 +334,12 @@ from cbers4asat.tools import pansharpening
 import rasterio as rio
 from rasterio.plot import show
 
-# ATENÇÃO
-## O algoritmo do pansharpening utiliza uma grande quantidade de memória,
-## sendo proporcional ao tamanho da imagem pancromática.
+# ATENÇÃO ================================
+#
+# O algoritmo do pansharpening utiliza uma grande quantidade de memória RAM,
+# sendo proporcional ao tamanho da imagem pancromática.
+#
+# ========================================
 
 pansharpening(
     panchromatic="./CBERS4A_WPM22312920210829/CBERS_4A_WPM_20210829_223_129_L4_BAND0.tif",
@@ -288,7 +350,7 @@ pansharpening(
 
 raster = rio.open("./OUTPUT/PANSHARP.tif")
 
-show(raster.read(), transform=raster.transform)
+show(raster)
 ```
 
 ### Resultado

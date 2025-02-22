@@ -15,6 +15,13 @@ intuitiva realizar diversas ações, como:
 
 Veja todos os [exemplos de uso](https://cbers4asat.readthedocs.io/pt_BR/latest/examples/) na documentação.
 
+> "_Python library to search and process images from the CBERS-04A and AMAZONIA-1 satellites, which provide remote 
+> sensing data for the observation and monitoring of deforestation, particularly in the Amazon region, and diversified 
+> agriculture throughout the national territory, with a high repetition rate, in order to act in synergy with existing 
+> environmental programmes._"
+>
+> Text about cbers4asat from [Open Sustainable Technology Repository](https://github.com/protontypes/open-sustainable-technology).
+
 ---
 [![Latest Version](https://img.shields.io/pypi/v/cbers4asat?style=plastic)](https://pypi.python.org/pypi/cbers4asat/)
 [![Latest Version](https://img.shields.io/pypi/l/cbers4asat?style=plastic)](https://github.com/gabriel-russo/cbers4asat/blob/master/LICENSE)
@@ -23,15 +30,23 @@ Veja todos os [exemplos de uso](https://cbers4asat.readthedocs.io/pt_BR/latest/e
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Hatch project](https://img.shields.io/badge/%F0%9F%A5%9A-Hatch-4051b5.svg)](https://github.com/pypa/hatch)
 ![GitHub Workflow Status](https://github.com/gabriel-russo/cbers4asat/actions/workflows/build-cbers4asat.yml/badge.svg)
-![GitHub Workflow Status](https://github.com/gabriel-russo/cbers4asat/actions/workflows/build-cbers4asat-cli.yml/badge.svg)
 ![GitHub Workflow Status](https://github.com/gabriel-russo/cbers4asat/actions/workflows/test-cbers4asat.yml/badge.svg)
+![GitHub Workflow Status](https://github.com/gabriel-russo/cbers4asat/actions/workflows/check-inpe-stac-api-compatibility.yml/badge.svg)
 [![Documentation Status](https://readthedocs.org/projects/cbers4asat/badge/?version=latest)](https://cbers4asat.readthedocs.io/pt_BR/latest/?badge=latest)
 > [Read this README in english (old version of docs)](https://github.com/gabriel-russo/cbers4asat/blob/master/en-US_README.md)
 > 🇺🇸
 
-## Avisos:
-- Busca por path row desabilitada devido a grandes mudanças na API STAC. Até achar uma solução, mantém-se desabilitada.
-- CLI descontinuada.
+## Download
+
+```
+pip install cbers4asat
+```
+
+Instalação com a caixa de ferramentas
+
+```
+pip install "cbers4asat[tools]"
+```
 
 ## Busque imagens com poucas linhas de código
 
@@ -43,31 +58,38 @@ from datetime import date
 api = Cbers4aAPI('email@mail.com')
 
 # Área de interesse. Pode ser: bouding box, path row ou polygon.
-bbox = [-63.92944335937501, # Oeste
-        -8.819260401678381, # Sul
-        -63.79211425781251, # Leste
-        -8.722218306198739] # Norte
+path_row = (229, 124)
 
 # Buscando metadados. Este exemplo utiliza o path row (órbita/ponto). 
-# Consulte a órbita/ponto: http://www.dgi.inpe.br/documentacao/grades
-produtos = api.query(location=bbox,
+# Consulte a órbita/ponto: http://www.obt.inpe.br/OBT/assuntos/catalogo-cbers-amz-1
+produtos = api.query(location=path_row,
                      initial_date=date(2021, 6, 1),
                      end_date=date(2021, 7, 1),
                      cloud=100,
                      limit=10,
-                     collections=['AMAZONIA1_WFI_L2_DN', 'CBERS4A_WPM_L4_DN'])
+                     collections=['CBERS4A_WPM_L4_DN'])
 
 # Exibindo os resultados
 print(produtos)
 ```
+
+## Desenvolvimento amigável
+
+Biblioteca com tipagem, documentações e classes de apoio para uma melhor experiência de desenvolvimento.
+
+```python
+from cbers4asat import Collections as coll
+```
+
+![](docs/img/collection_enum.png)
 
 ## Utilize a caixa de ferramenta para os trabalhos mais comuns
 
 ```python
 # Para ver todas as ferramentas disponíveis, verifique a documentação
 from cbers4asat.tools import rgbn_composite
-import rasterio as rio
 from rasterio.plot import show
+import rasterio as rio
 
 # Criando a composição cor verdadeira
 rgbn_composite(red='./CBERS4A_WPM22812420210704/CBERS_4A_WPM_20210704_228_124_L4_BAND3.tif',
@@ -80,19 +102,7 @@ rgbn_composite(red='./CBERS4A_WPM22812420210704/CBERS_4A_WPM_20210704_228_124_L4
 # Plotando a imagem
 raster = rio.open("./STACK/CBERS4A_WPM22812420210704_TRUE_COLOR.tif")
 
-show(raster.read(), transform=raster.transform)
-```
-
-## Download da biblioteca com pip
-
-```
-pip install cbers4asat
-```
-
-Instalação com a caixa de ferramentas
-
-```
-pip install "cbers4asat[tools]"
+show(raster)
 ```
 
 ## Documentação

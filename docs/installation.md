@@ -22,4 +22,7 @@ python -m hatch run test
 
 ## Versões do Python suportadas
 
-Atualmente a biblioteca possui suporte confirmado para versões maiores e iguais a `3.8`.
+Atualmente a biblioteca possui suporte confirmado para versões maiores e iguais a `3.11`.
+
+Devido ao uso do [StrEnum](https://docs.python.org/3.11/howto/enum.html#strenum), a biblioteca apenas funciona para
+versões acima de 3.11.
