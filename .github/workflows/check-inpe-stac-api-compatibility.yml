@@ -9,25 +9,28 @@ jobs:
   check-compatibility:
     runs-on: ubuntu-latest
     steps:
-      - name: Run code to check STAC API connection
+      - name: Run code to check STAC API compatibility
         run: |
           python -m pip install --upgrade pip
           pip install cbers4asat
 
           python3 -c \
           'from cbers4asat import Cbers4aAPI;\
-          api = Cbers4aAPI("yolo");\
-          p = api.query_by_id(scene_id="CBERS4A_WPM22912420210830", collection="CBERS4A_WPM_L4_DN");\
+          api = Cbers4aAPI();\
+          p = api.query_by_id(\
+            scene_id="CBERS4A_WPM22912420210830",\
+            collection="CBERS4A_WPM_L4_DN");\
           print(p)'
 
           python3 -c \
           'from cbers4asat import Cbers4aAPI;\
           from datetime import date;\
-          api = Cbers4aAPI("yolo");\
-          p = api.query(location=(229, 124),\
-               initial_date=date(2023, 8, 25),\
-               end_date=date.today(),\
-               cloud=100,\
-               limit=100,\
-               collections=["CBERS4A_WPM_L4_DN"]);\
+          api = Cbers4aAPI();\
+          p = api.query(\
+            location=(229, 124),\
+            initial_date=date(2023, 8, 25),\
+            end_date=date.today(),\
+            cloud=100,\
+            limit=1,\
+            collections=["CBERS4A_WPM_L4_DN"]);\
           print(p)'

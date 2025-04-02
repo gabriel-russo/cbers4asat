@@ -55,7 +55,7 @@ from cbers4asat import Cbers4aAPI
 from datetime import date
 
 # Inicializando a biblioteca
-api = Cbers4aAPI('email@mail.com')
+api = Cbers4aAPI('email@mail.com') # E-mail usado no login da plataforma https://www.dgi.inpe.br/catalogo/explore
 
 # Área de interesse. Pode ser: bouding box, path row ou polygon.
 path_row = (229, 124)

@@ -1,28 +1,23 @@
 # Instalação
 
-Faça a instalação do `cbers4asat` com o pip
+Faça a instalação do `cbers4asat` com o pip:
+
 ```
 pip install cbers4asat
 ```
 
-Instalação com a caixa de ferramentas
+Instalação com a caixa de ferramentas:
+
 ```
 pip install "cbers4asat[tools]"
 ```
 
-## Executar os testes unitários
-
-Para executar os testes unitários do projeto faça:
-```commandline
-git clone https://github.com/gabriel-russo/cbers4asat.git
-cd cbers4asat
-pip install -e ".[dev]"
-python -m hatch run test
-```
-
 ## Versões do Python suportadas
 
-Atualmente a biblioteca possui suporte confirmado para versões maiores e iguais a `3.11`.
+Atualmente a biblioteca possui suporte confirmado para versões maiores ou igual a `3.11`.
 
-Devido ao uso do [StrEnum](https://docs.python.org/3.11/howto/enum.html#strenum), a biblioteca apenas funciona para
-versões acima de 3.11.
+[Linux] Para verificar a versão do python instalada na sua máquina, abra um terminal e digite o comando:
+
+```commandline
+python3 --version
+```

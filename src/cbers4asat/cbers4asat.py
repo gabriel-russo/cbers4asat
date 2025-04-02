@@ -4,7 +4,7 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import date
 from os import getcwd, cpu_count
 from os.path import isdir, join
-from typing import List, Dict, Union
+from typing import List, Dict, Union, Optional
 
 # PyPi Packages
 from geopandas import GeoDataFrame
@@ -24,19 +24,22 @@ from .cbers4a import (
 
 class Cbers4aAPI:
     """
-    The CBERS4A API class. Query, download or transform data from CBERS4A STAC API.
+    The CBERS4A API class. Query, download or transform data from CBERS-4A STAC API.
+
+    Args:
+        email: Sign-in e-mail used at https://www.dgi.inpe.br/catalogo/explore
     """
 
-    def __init__(self, user: str = ""):
-        self._user = user
+    def __init__(self, email: Optional[str] = None):
+        self._email = email
 
     @property
-    def user(self):
-        return self._user
+    def email(self):
+        return self._email
 
-    @user.setter
-    def user(self, user: str):
-        self._user = user
+    @email.setter
+    def email(self, email: str):
+        self._email = email
 
     @staticmethod
     def query(
@@ -149,7 +152,7 @@ class Cbers4aAPI:
 
             for band in bands:
                 tasks.append(
-                    (Download().download, product.band_url(band), self.user, outdir)
+                    (Download().download, product.band_url(band), self.email, outdir)
                 )
 
         with ThreadPoolExecutor(max_workers=threads) as t_pool:
@@ -180,7 +183,7 @@ class Cbers4aAPI:
                 outdir = join(root, product.id)
             for band in bands:
                 tasks.append(
-                    (Download().download, product.band_url(band), self.user, outdir)
+                    (Download().download, product.band_url(band), self.email, outdir)
                 )
 
         with ThreadPoolExecutor(max_workers=threads) as t_pool:
@@ -216,7 +219,7 @@ class Cbers4aAPI:
             raise TypeError("Choose bands to download.")
         elif not isdir(outdir):
             raise NotADirectoryError("Choose a valid output directory.")
-        elif not self.user:
+        elif not self.email:
             raise Exception("Credentials not provided!")
 
         if isinstance(products, dict):

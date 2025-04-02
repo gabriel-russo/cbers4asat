@@ -12,11 +12,15 @@ from .utils.dataclass import ignore_extras, SerializationCapabilities
 @dataclass
 class ItemCollection(SerializationCapabilities):
     """
-    Class to parse GeoJSON from INPE STAC Catalog
+    Class to parse response from INPE STAC Catalog.
+
+    In this context, STAC Catalog uses the GeoJSON structure and has predefined properties keys.
+
+    So, the ItemCollection class maps the outer container: The Collection and his items.
     """
 
-    type: str
     features: list[Item]
+    type: str = "FeatureCollection"
 
     def __post_init__(self):
         if len(self.features):
@@ -36,14 +40,15 @@ class ItemCollection(SerializationCapabilities):
 
     def __iter__(self) -> Iterable[Item]:
         """
-        docstring
+        Iterate the items inside this collection.
         """
         for feature in self.features:
             yield feature
 
     def get_features_assets(self) -> None:
         """
-        docstring
+        STAC API return the items without assets, so, when needed, call this
+        function to load all the assets inside every item.
         """
         for feature in self.features:
             feature.get_assets()

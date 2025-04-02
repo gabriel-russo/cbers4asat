@@ -25,10 +25,18 @@ class SearchItem:
     # INPE STAC search item in collection
     BASE_URL_SEARCH_ITEM: str = "https://www.dgi.inpe.br/lgi-stac/collections"
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.search_item_body: STACItemRequestBody = STACItemRequestBody()
 
-    def __call__(self):
+    def __call__(self) -> dict | Exception:
+        """
+        Make request using the search parameters.
+
+        Return:
+            GeoJson-like dictionary.
+        Raise:
+            ``Exception`` if any http error.
+        """
         features = list()
         with Session() as session:
             for id_ in self.search_item_body.ids:
@@ -56,7 +64,15 @@ class SearchItem:
         self, ids: list[str], collection: Union[str, Collections]
     ) -> None | Exception:
         """
-        docstring
+        Id(s) to search inside a collection.
+
+        Args:
+            ids: Item id String or list of item id strings.
+            collection: Collection name to search into as string or Collections Enum.
+        Return:
+            Void
+        Raise:
+            ``Exception`` if id(s) or collection is empty.
         """
         if not len(ids):
             raise Exception("Ids to search list cannot be empty.")
@@ -75,13 +91,18 @@ class Search:
     # INPE STAC Catalog
     BASE_URL_SEARCH: str = "https://www.dgi.inpe.br/stac-compose/stac/search/"
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.stac_request_body = STACRequestBody()
         self.providers_body = Providers()
 
-    def __call__(self) -> dict:
+    def __call__(self) -> dict | Exception:
         """
-        docstring
+        Make request using the search parameters.
+
+        Return:
+            GeoJson-like dictionary.
+        Raise:
+            ``Exception`` if any http error.
         """
         self.stac_request_body.providers.append(self.providers_body)
         with Session() as session:
@@ -119,14 +140,19 @@ class Search:
 
     def bbox(self, bbox: list[float]) -> None | Exception:
         """
-        Only features that have a geometry that intersects the bounding box are selected
+        Only products that have a geometry/footprint that intersects the bounding box are selected.
 
-            Parameters:
-                bbox (list): The bounding box provided as a list of four floats,
-                minimum longitude, minimum latitude, maximum longitude and maximum latitude.
+        Args:
+            bbox: The bounding box provided as a list of four floats, minimum longitude, minimum latitude, maximum longitude and maximum latitude.
+        Return:
+            Void
+        Raise:
+            ``Exception`` if bbox list is empty or bbox coordinates is not float numbers or bbox does not have 4 coordinates.
         """
         if not len(bbox):
             raise Exception("Bounding box cannot be empty.")
+        elif not all([isinstance(coord, float) for coord in bbox]):
+            raise Exception("Bounding box coordinates must be float numbers.")
         elif len(bbox) != 4:
             raise Exception(
                 "Bounding box must have four float numbers representing the coordinates."
@@ -134,9 +160,17 @@ class Search:
 
         self.stac_request_body.bbox = bbox
 
-    def date_interval(self, start: date, end: date) -> None:
+    def date_interval(self, start: date, end: date) -> None | Exception:
         """
-        docstring
+        Search for scenes that was taken in this interval of dates.
+
+        Args:
+            start: Initial date. The older part of interval.
+            end: End date. The most recent part of interval.
+        Return:
+            Void
+        Raise:
+            ``Exception`` if the start date is more recent than end date.
         """
         if start > end:
             raise Exception("Initial date must be older than the end date.")
@@ -149,7 +183,14 @@ class Search:
         self, collections: Union[list[str], list[Collections]]
     ) -> None | Exception:
         """
-        docstring
+        Will search products inside these collections.
+
+        Args:
+            collections: Collections name list to search into as string or Collections Enum.
+        Return:
+            Void
+        Raise:
+            ``Exception`` if collections list is empty.
         """
         if not len(collections):
             raise Exception("Collections cannot be empty.")
@@ -160,15 +201,32 @@ class Search:
 
     def limit(self, limit: int) -> None | Exception:
         """
-        docstring
+        How much products will return from query.
+
+        Args:
+            limit: limit value of products that will return from query
+        Return:
+            Void
+        Raise:
+            ``Exception`` if limit value is less or equal than zero.
         """
         if limit <= 0:
             raise Exception("Limit value must be greater than 0.")
+
         self.stac_request_body.limit = limit
 
     def path_row(self, path: int, row: int) -> None | Exception:
         """
-        docstring
+        Get product by specifying the cell from grid.
+        Grid can be found: http://www.obt.inpe.br/OBT/assuntos/catalogo-cbers-amz-1
+
+        Args:
+            path: Path number from grid
+            row: Row number from grid
+        Return:
+            Void
+        Raise:
+            ``Exception`` if path or row is empty.
         """
         if not path or not row:
             raise Exception("Path and/or row cannot be empty.")
@@ -178,8 +236,16 @@ class Search:
 
     def cloud_cover(self, cloud_cover: int) -> None | Exception:
         """
-        docstring
+        Maximum cloud coverage on scene.
+
+        Args:
+             cloud_cover: Maximum cloud cover percentage between 0 and 100 range.
+        Return:
+            Void
+        Raise:
+            ``Exception`` if cloud cover is less than zero and greater than 100.
         """
         if cloud_cover < 0 or cloud_cover > 100:
             raise Exception("Cloud cover must be between 0 and 100.")
+
         self.providers_body.query.cloud_cover.update(lte=cloud_cover)

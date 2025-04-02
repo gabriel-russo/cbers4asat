@@ -7,6 +7,7 @@ from shapely.geometry import Polygon
 from mocks import (
     MockStacFeatureCollectionResponse,
     MockStacFeatureResponse,
+    MockStacFeatureCollectionEmptyResponse,
     feature_without_bands,
     feature_with_bands,
 )
@@ -14,6 +15,11 @@ from mocks import (
 
 class TestCbers4aAPI:
     api = Cbers4aAPI("test@test.com")
+
+    expected_result_from_empty_query_response = {
+        "type": "FeatureCollection",
+        "features": [],
+    }
 
     expected_result_from_query = {
         "type": "FeatureCollection",
@@ -25,12 +31,16 @@ class TestCbers4aAPI:
         "features": [feature_with_bands],
     }
 
-    def test_user(self):
-        assert "test@test.com" in self.api.user
+    def test_email(self):
+        assert "test@test.com" in self.api.email
 
-    def test_set_user(self):
-        self.api.user = "another@test.com"
-        assert self.api.user == "another@test.com"
+    def test_set_email(self):
+        self.api.email = "another@test.com"
+        assert self.api.email == "another@test.com"
+
+    def test_empty_email(self):
+        api2 = Cbers4aAPI()
+        assert api2.email is None
 
     def test_query_bbox(self, monkeypatch):
         def mock_post(*args, **kwargs):
@@ -146,6 +156,23 @@ class TestCbers4aAPI:
 
         assert self.expected_result_after_query_item_assets == result
 
+    def test_query_empty_response(self, monkeypatch):
+        def mock_post(*args, **kwargs):
+            return MockStacFeatureCollectionEmptyResponse()
+
+        monkeypatch.setattr("requests.Session.post", mock_post)
+
+        result = self.api.query(
+            location=[-63.9, -8.8, -63.7, -8.7],
+            initial_date=date(2021, 1, 1),
+            end_date=date(2021, 2, 1),
+            cloud=100,
+            limit=1,
+            collections=["CBERS4A_WPM_L4_DN"],
+        )
+
+        assert self.expected_result_from_empty_query_response == result
+
     def test_to_geodataframe(self):
         gdf = self.api.to_geodataframe(self.expected_result_from_query)
 
@@ -166,6 +193,11 @@ class TestCbers4aAPI:
         assert len(gdf) == 1
 
     def test_missing_credentials_exception(self):
+        with pytest.raises(Exception):
+            api = Cbers4aAPI()
+            api.download(self.expected_result_from_query, bands=["blue"])
+
+    def test_empty_credentials_exception(self):
         with pytest.raises(Exception):
             api = Cbers4aAPI("")
             api.download(self.expected_result_from_query, bands=["blue"])
