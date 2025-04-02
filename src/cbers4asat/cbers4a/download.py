@@ -31,6 +31,13 @@ class Download:
     def download(self, url: str, credential: str, outdir: str) -> None | Exception:
         """
         Download the asset.
+
+        Args:
+            url: URL pointing to asset/band .TIFF
+            credential: e-mail used in the explorer inpe platform.
+            outdir: Output directory
+        Raise:
+            ``Exception`` if any http error occurs.
         """
         if not exists(outdir):
             makedirs(outdir, exist_ok=True)

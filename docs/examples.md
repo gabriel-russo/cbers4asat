@@ -3,24 +3,24 @@
 <!-- TOC -->
 * [Exemplos](#exemplos)
   * [Projetos que utilizam a biblioteca `cbers4asat`:](#projetos-que-utilizam-a-biblioteca-cbers4asat)
-    * [1 - Mosaico de imagens do Estado de Rondônia automatizado.](#1---mosaico-de-imagens-do-estado-de-rondônia-automatizado)
-    * [2 - Baixar a cena mais recente do Rio Madeira (RO), criar composição RGB e gerar XYZ tiles.](#2---baixar-a-cena-mais-recente-do-rio-madeira-ro-criar-composição-rgb-e-gerar-xyz-tiles)
+    * [1 - Mosaico de imagens do Estado de Rondônia automatizado.](#1-mosaico-de-imagens-do-estado-de-rondonia-automatizado)
+    * [2 - Baixar a cena mais recente do Rio Madeira (RO), criar composição RGB e gerar XYZ tiles.](#2-baixar-a-cena-mais-recente-do-rio-madeira-ro-criar-composicao-rgb-e-gerar-xyz-tiles)
   * [Buscando produtos com Bounding Box](#buscando-produtos-com-bounding-box)
-  * [Buscando produtos com órbita e ponto](#buscando-produtos-com-órbita-e-ponto)
-  * [Buscando produtos com órbita e ponto utilizando o Enum Collections](#buscando-produtos-com-órbita-e-ponto-utilizando-o-enum-collections)
-  * [Buscando produtos com órbita e ponto utilizando strings e Enum Collections](#buscando-produtos-com-órbita-e-ponto-utilizando-strings-e-enum-collections)
+  * [Buscando produtos com órbita e ponto](#buscando-produtos-com-orbita-e-ponto)
+  * [Buscando produtos com órbita e ponto utilizando o Enum Collections](#buscando-produtos-com-orbita-e-ponto-utilizando-o-enum-collections)
+  * [Buscando produtos com órbita e ponto utilizando strings e Enum Collections](#buscando-produtos-com-orbita-e-ponto-utilizando-strings-e-enum-collections)
   * [Buscando produtos com geometria](#buscando-produtos-com-geometria)
   * [Buscando produtos por ID](#buscando-produtos-por-id)
   * [Download de produtos](#download-de-produtos)
-  * [Converter coleção de produtos para GeoDataFrame](#converter-coleção-de-produtos-para-geodataframe)
+  * [Converter coleção de produtos para GeoDataFrame](#converter-colecao-de-produtos-para-geodataframe)
   * [Download de produtos no GeoDataFrame](#download-de-produtos-no-geodataframe)
   * [Empilhamento de bandas](#empilhamento-de-bandas)
-    * [Resultado](#resultado)
+    * [Resultado do empilhamento de bandas](#resultado-do-empilhamento-de-bandas)
   * [Pansharpening](#pansharpening)
-    * [Resultado](#resultado-1)
+    * [Resultado do pansharpening](#resultado-do-pansharpening)
   * [Download do grid do cbers4a ou amazonia1](#download-do-grid-do-cbers4a-ou-amazonia1)
-  * [Recortando raster a partir de uma máscara - GeoJSON](#recortando-raster-a-partir-de-uma-máscara---geojson)
-  * [Recortando raster a partir de uma máscara - GeoDataFrame](#recortando-raster-a-partir-de-uma-máscara---geodataframe)
+  * [Recortando raster a partir de uma máscara - GeoJSON](#recortando-raster-a-partir-de-uma-mascara-geojson)
+  * [Recortando raster a partir de uma máscara - GeoDataFrame](#recortando-raster-a-partir-de-uma-mascara-geodataframe)
 <!-- TOC -->
 
 ## Projetos que utilizam a biblioteca `cbers4asat`:
@@ -323,7 +323,7 @@ raster = rio.open("./STACK/CBERS4A_WPM22812420210704_TRUE_COLOR.tif")
 show(raster.read(), transform=raster.transform)
 ```
 
-### Resultado
+### Resultado do empilhamento de bandas
 
 ![true color](img/rgbn_composite_true_color.png)
 
@@ -353,7 +353,7 @@ raster = rio.open("./OUTPUT/PANSHARP.tif")
 show(raster)
 ```
 
-### Resultado
+### Resultado do pansharpening
 
 ![pansharp](img/pansharp.png)
 

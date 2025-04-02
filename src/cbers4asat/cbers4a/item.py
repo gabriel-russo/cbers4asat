@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Standard Libraries
 from dataclasses import dataclass
-from typing import Union, Optional
+from typing import Union, Optional, TypeVar
 
 # Local Modules
 from .search import SearchItem
@@ -11,6 +11,10 @@ from .utils.dataclass import SerializationCapabilities, ignore_extras
 @ignore_extras
 @dataclass
 class Geometry:
+    """
+    Class that represents the Item geometry interface.
+    """
+
     type: str
     coordinates: list[list[list[float]]]
 
@@ -18,6 +22,10 @@ class Geometry:
 @ignore_extras
 @dataclass
 class Properties(SerializationCapabilities):
+    """
+    Class that represents the Item properties.
+    """
+
     datetime: str
     path: int
     row: int
@@ -29,6 +37,10 @@ class Properties(SerializationCapabilities):
 @ignore_extras
 @dataclass
 class Asset:
+    """
+    Class that represents an Asset from Item.
+    """
+
     href: str
     type: str
 
@@ -36,6 +48,10 @@ class Asset:
 @ignore_extras
 @dataclass
 class Assets:
+    """
+    Class that represents the assets from Item.
+    """
+
     thumbnail: Asset
     red: Optional[Asset] = None
     green: Optional[Asset] = None
@@ -58,11 +74,16 @@ class Assets:
             self.pan = Asset(**self.pan)
 
 
+Item = TypeVar("Item")
+
+
 @ignore_extras
 @dataclass
 class Item(SerializationCapabilities):
     """
     Class to parse items from INPE STAC Catalog
+
+    This represents one image from CBERS-4/CBERS-4A/AMAZONIA-1.
     """
 
     type: str
@@ -82,33 +103,59 @@ class Item(SerializationCapabilities):
             self.assets = Assets(**self.assets)
 
     @staticmethod
-    def from_search(_id: str, collection: str) -> "Item":
+    def from_search(_id: str, collection: str) -> Item | Exception:
         """
-        docstring
+        Create an Item by making a search by ID inside a collection.
+
+        Args:
+            _id: Item ID
+            collection: Collection to search into.
+        Return:
+            Item object.
+        Raise:
+            ``Exception`` if item not found.
         """
         search = SearchItem()
         search.ids(
             list([_id]),
             collection=collection,
         )
-        return Item(**search().get("features")[0])
+
+        features = search().get("features")
+
+        if not len(features):
+            raise Exception("Item not found.")
+
+        return Item(**features[0])
 
     def get_assets(self) -> None:
         """
-        docstring
+        Get assets/bands of the object.
         """
         self.assets = Item.from_search(self.id, self.collection).assets
 
     def has_band(self, band: str) -> bool:
         """
-        docstring
+        Check if Item has a band search by its name.
+
+        Args:
+            band: Band name. Ex.: red
+        Return:
+            True if item has band.
         """
         return getattr(self.assets, band, None) is not None
 
-    def band_url(self, band: str) -> str:
+    def band_url(self, band: str) -> str | Exception:
         """
-        docstring
+        Get asset/band URL.
+
+        Args:
+            band: Band name. Ex.: red
+        Return:
+            URL
+        Raise:
+            ``Exception`` if Item does not have band.
         """
         if not self.has_band(band):
             raise Exception(f"Band {band} does not exist in this item!")
-        return getattr(self.assets, band, None).href
+        return getattr(self.assets, band).href
