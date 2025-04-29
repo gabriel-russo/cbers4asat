@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 # Standard Libraries
 from datetime import date
-from os.path import join
 from typing import Union
 
 # PyPi Packages
@@ -42,12 +41,7 @@ class SearchItem:
             for id_ in self.search_item_body.ids:
                 try:
                     response = session.get(
-                        join(
-                            self.BASE_URL_SEARCH_ITEM,
-                            self.search_item_body.collection,
-                            "items",
-                            id_,
-                        )
+                        f"{self.BASE_URL_SEARCH_ITEM}/{self.search_item_body.collection}/items/{id_}"
                     )
                     response.raise_for_status()
                     feature = response.json()
