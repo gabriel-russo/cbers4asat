@@ -7,7 +7,7 @@ authors = [
 license = { file = "LICENSE" }
 keywords = ["cbers", "cbers4a", "cbers-04a", "amazonia-1", "remote sensing", "geoprocessing"]
 readme = "README.md"
-requires-python = ">=3.9,<4"
+requires-python = ">=3.11,<4"
 classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
