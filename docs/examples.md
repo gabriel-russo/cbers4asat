@@ -12,6 +12,7 @@
   * [Buscando produtos com geometria](#buscando-produtos-com-geometria)
   * [Buscando produtos por ID](#buscando-produtos-por-id)
   * [Download de produtos](#download-de-produtos)
+  * [Download de produtos com seus respectivos metadados](#download-de-produtos-com-metadados-xml)
   * [Converter coleção de produtos para GeoDataFrame](#converter-colecao-de-produtos-para-geodataframe)
   * [Download de produtos no GeoDataFrame](#download-de-produtos-no-geodataframe)
   * [Empilhamento de bandas](#empilhamento-de-bandas)
@@ -240,6 +241,44 @@ api.download(products=produtos,
 # ++- CBERS_4A_WPM_20210830_229_124_L4_BAND3.tif
 # ++- CBERS_4A_WPM_20210830_229_124_L4_BAND2.tif
 # ++- CBERS_4A_WPM_20210830_229_124_L4_BAND1.tif
+```
+
+## Download de produtos com Metadados XML
+
+```python
+from cbers4asat import Cbers4aAPI
+from datetime import date
+
+api = Cbers4aAPI('seu.login@email.com')
+
+path_row = (229, 124)
+
+data_inicial = date(2021, 8, 25)
+data_final = date(2021, 9, 25)
+
+produtos = api.query(location=path_row,
+                     initial_date=data_inicial,
+                     end_date=data_final,
+                     cloud=100,
+                     limit=1,
+                     collections=['CBERS4A_WPM_L4_DN'])
+
+# Bandas escolhida: vermelha. Junto com seu respectivo metadado em XML.
+# Download de metadados das cenas é opcional.
+api.download(products=produtos,
+             bands=['red'],
+             threads=3,
+             outdir='./downloads',
+             with_folder=True,
+             with_metadata=True # Baixar com metadados
+             )
+
+# Resultado:
+#
+# downloads/
+# +- CBERS4A_WPM22912420210830/
+# ++- CBERS_4A_WPM_20210830_229_124_L4_BAND3.tif
+# ++- CBERS_4A_WPM_20210830_229_124_L4_BAND3.xml
 ```
 
 ## Converter coleção de produtos para GeoDataFrame
