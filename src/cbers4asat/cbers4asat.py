@@ -134,6 +134,7 @@ class Cbers4aAPI:
         threads: int = cpu_count(),
         outdir: str = getcwd(),
         with_folder: bool = False,
+        with_metadata: bool = False,
     ):
         try:
             products = ItemCollection(**products)
@@ -154,6 +155,11 @@ class Cbers4aAPI:
                 tasks.append(
                     (Download().download, product.band_url(band), self.email, outdir)
                 )
+                if with_metadata:
+                    url_xml = product.band_url(band).replace('.tif', '.xml')
+                    tasks.append(
+                        (Download().download, url_xml, self.email, outdir)
+                    )
 
         with ThreadPoolExecutor(max_workers=threads) as t_pool:
             for task in tasks:
@@ -168,6 +174,7 @@ class Cbers4aAPI:
         threads: int = cpu_count(),
         outdir: str = getcwd(),
         with_folder: bool = False,
+        with_metadata: bool = False,
     ):
         features = list()
         for index, row in products.iterrows():
@@ -185,6 +192,12 @@ class Cbers4aAPI:
                 tasks.append(
                     (Download().download, product.band_url(band), self.email, outdir)
                 )
+                if with_metadata:
+                    url_xml = product.band_url(band).replace('.tif', '.xml')
+                    tasks.append(
+                        (Download().download, url_xml, self.email, outdir)
+                    )
+
 
         with ThreadPoolExecutor(max_workers=threads) as t_pool:
             for task in tasks:
@@ -199,6 +212,7 @@ class Cbers4aAPI:
         threads: int = cpu_count(),
         outdir: str = getcwd(),
         with_folder: bool = False,
+        with_metadata: bool = False,
     ):
         """
         Download bands from all given scenes
@@ -225,11 +239,11 @@ class Cbers4aAPI:
         if isinstance(products, dict):
             if not products:  # Check if dictionary is empty
                 raise Exception("No product to download.")
-            return self.__download(products, bands, threads, outdir, with_folder)
+            return self.__download(products, bands, threads, outdir, with_folder, with_metadata)
         elif isinstance(products, GeoDataFrame):
             if products.empty:  # Check if data frame is empty
                 raise Exception("No product to download.")
-            return self.__download_gdf(products, bands, threads, outdir, with_folder)
+            return self.__download_gdf(products, bands, threads, outdir, with_folder, with_metadata)
         else:
             raise Exception("Bad Arguments.")
 
