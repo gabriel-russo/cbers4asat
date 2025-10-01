@@ -223,9 +223,11 @@ class Cbers4aAPI:
             threads: Max of cpu threads
             outdir: Output path
             with_folder: Group scene bands in a sub folder
+            with_metadata: Download band's metadata (XML)
         Examples:
             - download(my_query_result, ['red', 'green'], 3, './downlaods', true)
             - download(my_query_result, ['red'], outdir='./downloads', with_folder=true)
+            - download(my_query_result, ['blue'], with_metadata=True)
         Returns:
             GeoTIFF files
         """
