@@ -133,7 +133,7 @@ no [painel de projetos](https://github.com/gabriel-russo/cbers4asat/projects)
 
 # Licença
 
-Copyright (c) 2025 Gabriel Russo
+Copyright (c) 2026 Gabriel Russo
 
 Copyright (c) 2020 Sandro Klippel
 
