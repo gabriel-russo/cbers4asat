@@ -1,6 +1,6 @@
 [project]
 name = "cbers4asat"
-version = "0.10.0"
+version = "0.10.1"
 description = "Biblioteca Python para realizar a busca e processamento de imagens dos satélites CBERS-04A e AMAZONIA-1"
 authors = [
     { name = "Gabriel Russo", email = "gabrielrusso@protonmail.com" }]
@@ -12,6 +12,7 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Topic :: Scientific/Engineering :: GIS"
