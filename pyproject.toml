@@ -36,7 +36,7 @@ tools = [
 
 [build-system]
 build-backend = "hatchling.build"
-requires = ["hatchling>=1.27.0"]
+requires = ["hatchling >= 1.26, < 1.32"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/cbers4asat"]
