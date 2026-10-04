@@ -18,7 +18,7 @@ def ignore_extras(cls):
         docstring
         """
         __original__init__(
-            self, **{k: v for k, v in kwargs.items() if k in self.__annotations__}
+            self, **{k: v for k, v in kwargs.items() if k in type(self).__annotations__}
         )
 
     cls.__init__ = filter_extras
