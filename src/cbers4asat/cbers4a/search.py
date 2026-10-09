@@ -1,17 +1,14 @@
 # -*- coding: utf-8 -*-
-# Standard Libraries
 from datetime import date
 from typing import Union
 
-# PyPi Packages
 from requests import HTTPError, Session
 
-# Local Modules
 from .collections import Collections
 from .types import (
     CollectionDict,
     FeatureCollectionDict,
-    STACItemRequestBodyDict,
+    FeatureDict,
     STACRequestBodyDict,
 )
 
@@ -25,12 +22,10 @@ class SearchItem:
     BASE_URL_SEARCH_ITEM: str = "https://www.dgi.inpe.br/lgi-stac/collections"
 
     def __init__(self) -> None:
-        self.search_item_body: STACItemRequestBodyDict = {
-            "ids": [],
-            "collection": "",
-        }
+        self.__ids = []
+        self.__collection: str = ""
 
-    def __call__(self) -> dict | Exception:
+    def __call__(self) -> FeatureCollectionDict:
         """
         Make request using the search parameters.
 
@@ -39,17 +34,24 @@ class SearchItem:
         Raise:
             ``Exception`` if any http error.
         """
-        features = list()
+        features: list[FeatureDict] = []
+
         with Session() as session:
-            for id_ in self.search_item_body["ids"]:
+            session.headers.update({"User-Agent": "cbers4asat (Python)"})
+
+            for id_ in self.__ids:
                 try:
                     response = session.get(
-                        f"{self.BASE_URL_SEARCH_ITEM}/{self.search_item_body['collection']}/items/{id_}"
+                        f"{self.BASE_URL_SEARCH_ITEM}/{self.__collection}/items/{id_}"
                     )
+
                     response.raise_for_status()
+
                     feature = response.json()
+
                     if feature.get("type") == "Feature":
                         features.append(feature)
+
                 except HTTPError as err:
                     raise Exception(
                         f"{response.status_code} - ERROR searching {id_}. Reason: {response.reason}. Exception: {err}"
@@ -57,27 +59,36 @@ class SearchItem:
 
         return {"type": "FeatureCollection", "features": features}
 
-    def ids(
-        self, ids: list[str], collection: Union[str, Collections]
-    ) -> None | Exception:
+    def ids(self, ids: list[str]) -> None:
         """
         Id(s) to search inside a collection.
 
         Args:
             ids: Item id String or list of item id strings.
-            collection: Collection name to search into as string or Collections Enum.
-        Return:
-            Void
+
         Raise:
-            ``Exception`` if id(s) or collection is empty.
+            ``ValueError`` if id(s) or collection is empty.
         """
         if not len(ids):
-            raise Exception("Ids to search list cannot be empty.")
-        elif not collection:
-            raise Exception("Collection cannot be empty.")
+            raise ValueError("Ids to search list cannot be empty.")
 
-        self.search_item_body["ids"] = ids
-        self.search_item_body["collection"] = collection
+        self.__ids = ids
+
+    def collection(self, collection: str | Collections) -> None:
+        """
+        Collection to search.
+
+        Args:
+            collection: Collection name to search into as string or Collections Enum.
+
+        Raise:
+            ``ValueError`` if id(s) or collection is empty.
+        """
+
+        if not collection:
+            raise ValueError("Collection cannot be empty.")
+
+        self.__collection = str(collection)
 
 
 class Search:
@@ -98,16 +109,14 @@ class Search:
         self.__limit: int = 0
         self.__collections: list[CollectionDict] = []
 
-    def __call__(self) -> FeatureCollectionDict:
+    def get_request_body(self) -> STACRequestBodyDict:
         """
-        Make request using the search parameters.
+        Build and return the full STAC request body based on current search parameters.
 
         Return:
-            GeoJson-like dictionary.
-        Raise:
-            ``Exception`` if any http error.
+            Dictionary representing the STAC search request body.
         """
-        req_body: STACRequestBodyDict = {
+        return {
             "bbox": self.__bbox,
             "fromCatalog": "yes",
             "limit": self.__limit,
@@ -122,11 +131,22 @@ class Search:
             ],
         }
 
+    def __call__(self) -> FeatureCollectionDict:
+        """
+        Make request using the search parameters.
+
+        Return:
+            GeoJson-like dictionary.
+        Raise:
+            ``Exception`` if any http error.
+        """
         with Session() as session:
+            session.headers.update({"User-Agent": "cbers4asat (Python)"})
+
             try:
                 response = session.post(
                     self.BASE_URL_SEARCH,
-                    json=req_body,  # ty: ignore[invalid-argument-type]
+                    json=self.get_request_body(),  # ty: ignore[invalid-argument-type]
                 )
 
                 response.raise_for_status()
