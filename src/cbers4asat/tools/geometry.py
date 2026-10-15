@@ -1,7 +1,9 @@
+from pathlib import Path
+
 from geojson import load as geojson_load
 
 
-def read_geojson(geojson_file: str):
+def read_geojson(geojson_file: str | Path) -> dict:
     """
     Read a GeoJSON file into a GeoJSON object.
 
