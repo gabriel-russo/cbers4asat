@@ -1,4 +1,5 @@
 feature_without_bands = {
+    "stac_version": "0.9.0",
     "type": "Feature",
     "id": "ABC123",
     "collection": "y",
@@ -29,6 +30,7 @@ feature_without_bands = {
 }
 
 feature_with_bands = {
+    "stac_version": "0.9.0",
     "type": "Feature",
     "id": "ABC123",
     "collection": "y",
