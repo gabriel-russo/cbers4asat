@@ -5,33 +5,36 @@
 Biblioteca Python para realizar a busca e processamento de imagens dos satélites CBERS-04A e AMAZONIA-1.
 
 A biblioteca `cbers4asat` surgiu da necessidade de automatizar a busca e manipulação de imagens do satélite
-sino-brasileiro CBERS-04A utilizando linguagens de programação. Posteriormente foi incluido a automação do satélite AMAZONIA-1.
+sino-brasileiro CBERS-04A utilizando linguagens de programação. Posteriormente foi incluido a automação do satélite
+AMAZONIA-1.
 
 O design do projeto foi inspirado no [sentinelsat](https://github.com/sentinelsat/sentinelsat), onde é possível de forma
-intuitiva realizar diversas ações, como: 
-- Pesquisar por imagens. 
+intuitiva realizar diversas ações, como:
+
+- Pesquisar por imagens.
 - Baixar as imagens pesquisadas.
 - Processar as imagens baixadas.
 
 Veja todos os [exemplos de uso](https://cbers4asat.readthedocs.io/pt_BR/latest/examples/) na documentação.
 
-> "_Python library to search and process images from the CBERS-04A and AMAZONIA-1 satellites, which provide remote 
-> sensing data for the observation and monitoring of deforestation, particularly in the Amazon region, and diversified 
-> agriculture throughout the national territory, with a high repetition rate, in order to act in synergy with existing 
+> "_Python library to search and process images from the CBERS-04A and AMAZONIA-1 satellites, which provide remote
+> sensing data for the observation and monitoring of deforestation, particularly in the Amazon region, and diversified
+> agriculture throughout the national territory, with a high repetition rate, in order to act in synergy with existing
 > environmental programmes._"
 >
-> Text about cbers4asat from [Open Sustainable Technology Repository](https://github.com/protontypes/open-sustainable-technology).
+> Text about cbers4asat
+> from [Open Sustainable Technology Repository](https://github.com/protontypes/open-sustainable-technology).
 
 ---
 [![Latest Version](https://img.shields.io/pypi/v/cbers4asat?style=plastic)](https://pypi.python.org/pypi/cbers4asat/)
 [![Latest Version](https://img.shields.io/pypi/l/cbers4asat?style=plastic)](https://github.com/gabriel-russo/cbers4asat/blob/master/LICENSE)
 [![Latest Version](https://img.shields.io/pypi/pyversions/cbers4asat?style=plastic)](https://pypi.python.org/pypi/cbers4asat/)
 [![Latest Version](https://img.shields.io/pypi/dm/cbers4asat?style=plastic)](https://pypi.python.org/pypi/cbers4asat/)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![Hatch project](https://img.shields.io/badge/%F0%9F%A5%9A-Hatch-4051b5.svg)](https://github.com/pypa/hatch)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+[![uv](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json)](https://github.com/astral-sh/uv)
 ![GitHub Workflow Status](https://github.com/gabriel-russo/cbers4asat/actions/workflows/build-cbers4asat.yml/badge.svg)
 ![GitHub Workflow Status](https://github.com/gabriel-russo/cbers4asat/actions/workflows/test-cbers4asat.yml/badge.svg)
-![GitHub Workflow Status](https://github.com/gabriel-russo/cbers4asat/actions/workflows/check-inpe-stac-api-compatibility.yml/badge.svg)
+![GitHub Workflow Status](https://github.com/gabriel-russo/cbers4asat/actions/workflows/test-inpe-stac-api-contract.yml/badge.svg)
 [![Documentation Status](https://readthedocs.org/projects/cbers4asat/badge/?version=latest)](https://cbers4asat.readthedocs.io/pt_BR/latest/?badge=latest)
 > [Read this README in english (old version of docs)](https://github.com/gabriel-russo/cbers4asat/blob/master/en-US_README.md)
 > 🇺🇸
@@ -55,7 +58,7 @@ from cbers4asat import Cbers4aAPI
 from datetime import date
 
 # Inicializando a biblioteca
-api = Cbers4aAPI('email@mail.com') # E-mail usado no login da plataforma https://www.dgi.inpe.br/catalogo/explore
+api = Cbers4aAPI('email@mail.com')  # E-mail usado no login da plataforma https://www.dgi.inpe.br/catalogo/explore
 
 # Área de interesse. Pode ser: bouding box, path row ou polygon.
 path_row = (229, 124)
@@ -113,10 +116,11 @@ Você pode ler a documentação da biblioteca no link abaixo
 
 ## TCC
 
-Esse projeto foi meu objeto de estudo do Trabalho de Conclusão de Curso (TCC) no curso de Bacharelado em Ciência da Computação, você
+Esse projeto foi meu objeto de estudo do Trabalho de Conclusão de Curso (TCC) no curso de Bacharelado em Ciência da
+Computação, você
 pode visualizar o PDF neste Link:
 
-[Repositório Institucional da Universidade Federal de Rondônia](https://ri.unir.br/jspui/handle/123456789/4345)
+[Repositório Institucional da Universidade Federal de Rondônia](https://ri.unir.br/items/ab42bb46-18d4-4c5a-8cbd-73df317adcb2/full)
 
 ## Contribuição
 
