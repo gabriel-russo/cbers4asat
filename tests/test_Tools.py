@@ -26,7 +26,7 @@ class TestTools:
     def test_grid_download(self, mock_grid_response, tmp_path):
         grid_download(satellite="amazonia1", sensor="wfi", outdir=tmp_path.as_posix())
 
-        with open(tmp_path / "grid_amazonia1_wfi_sa.kmz", "rb") as f:
+        with open(tmp_path / "Grade_AMAZONIA1_WFI_AMSul.kml", "rb") as f:
             assert f.read() == b"dummydata"
 
     def test_pansharp(self, pansharp_assert_metadata, data_dir, tmp_path):

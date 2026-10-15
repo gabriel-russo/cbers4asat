@@ -1,13 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-Dictionary helpers to work with the STAC items.
-
-These functions replace the methods that used to live in the ``Item`` and
-``ItemCollection`` classes. Items are plain dictionaries (``ItemDict``) and are
-manipulated directly.
-"""
-
-# Local Modules
 
 from .search import SearchItem
 from .types import Bands, FeatureCollectionDict, FeatureDict
