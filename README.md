@@ -25,17 +25,19 @@ Veja todos os [exemplos de uso](https://cbers4asat.readthedocs.io/pt_BR/latest/e
 > Text about cbers4asat
 > from [Open Sustainable Technology Repository](https://github.com/protontypes/open-sustainable-technology).
 
----
 [![Latest Version](https://img.shields.io/pypi/v/cbers4asat?style=plastic)](https://pypi.python.org/pypi/cbers4asat/)
 [![Latest Version](https://img.shields.io/pypi/l/cbers4asat?style=plastic)](https://github.com/gabriel-russo/cbers4asat/blob/master/LICENSE)
 [![Latest Version](https://img.shields.io/pypi/pyversions/cbers4asat?style=plastic)](https://pypi.python.org/pypi/cbers4asat/)
 [![Latest Version](https://img.shields.io/pypi/dm/cbers4asat?style=plastic)](https://pypi.python.org/pypi/cbers4asat/)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![uv](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json)](https://github.com/astral-sh/uv)
+[![ty](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ty/main/assets/badge/v0.json)](https://github.com/astral-sh/ty)
+
 ![GitHub Workflow Status](https://github.com/gabriel-russo/cbers4asat/actions/workflows/build-cbers4asat.yml/badge.svg)
 ![GitHub Workflow Status](https://github.com/gabriel-russo/cbers4asat/actions/workflows/test-cbers4asat.yml/badge.svg)
 ![GitHub Workflow Status](https://github.com/gabriel-russo/cbers4asat/actions/workflows/test-inpe-stac-api-contract.yml/badge.svg)
 [![Documentation Status](https://readthedocs.org/projects/cbers4asat/badge/?version=latest)](https://cbers4asat.readthedocs.io/pt_BR/latest/?badge=latest)
+
 > [Read this README in english (old version of docs)](https://github.com/gabriel-russo/cbers4asat/blob/master/en-US_README.md)
 > 🇺🇸
 
@@ -49,6 +51,14 @@ Instalação com a caixa de ferramentas
 
 ```
 pip install "cbers4asat[tools]"
+```
+
+ou com [UV](https://github.com/astral-sh/uv)
+
+```
+uv add cbers4asat
+
+uv add cbers4asat --extra tools
 ```
 
 ## Busque imagens com poucas linhas de código
