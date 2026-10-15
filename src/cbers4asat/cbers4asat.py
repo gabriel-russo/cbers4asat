@@ -3,7 +3,7 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import date
 from os import cpu_count, getcwd
 from os.path import isdir, join
-from typing import Any, List, Optional, Union
+from typing import Any, List, Mapping, Optional, Union, cast
 
 from geopandas import GeoDataFrame
 from shapely.geometry import Polygon
@@ -48,7 +48,7 @@ class Cbers4aAPI:
         cloud: int,
         limit: int,
         collections: Union[list[str], list[Collections]],
-    ) -> FeatureCollectionDict:
+    ) -> dict:
         """
         Query Images from INPE's catalog
 
@@ -147,7 +147,7 @@ class Cbers4aAPI:
 
             for band in bands:
                 if not has_band(product, band):
-                    raise ValueError(f"Band {band} does not exist in this item!")
+                    raise ValueError(f"Band {band} does not exist in {product['id']}!")
 
                 url = band_url(product, band)
 
@@ -168,7 +168,7 @@ class Cbers4aAPI:
 
     def download(
         self,
-        products: Union[FeatureCollectionDict, GeoDataFrame],
+        products: Union[Mapping[str, Any], GeoDataFrame],
         bands: list[Bands],
         threads: int = -1,
         outdir: str = getcwd(),
@@ -201,56 +201,54 @@ class Cbers4aAPI:
         if not self.email:
             raise ValueError("Credentials not provided!")
 
+        if threads < -1 or threads == 0:
+            raise ValueError("Threads value must be greater than 0 or -1 to ALL CORES.")
+
         if isinstance(products, GeoDataFrame):
             if products.empty:  # Check if data frame is empty
                 raise Exception("No product to download.")
 
-            try:
-                features: FeatureCollectionDict = {
-                    "type": "FeatureCollection",
-                    "features": [],
-                }
+            features: FeatureCollectionDict = {
+                "type": "FeatureCollection",
+                "features": [],
+            }
 
-                search = SearchItem()
+            search = SearchItem()
 
-                for _, row in products.iterrows():
-                    search.ids([row.id])
-                    search.collection(row.collection)
-                    feat = search()
-                    features["features"].extend(feat["features"])
+            for _, row in products.iterrows():
+                search.ids([row.id])
+                search.collection(row.collection)
+                feat = search()
+                features["features"].extend(feat["features"])
 
-                self.__download(
-                    features,
-                    bands,
-                    threads,
-                    outdir,
-                    with_folder,
-                    with_metadata,
-                )
-            except Exception as err:
-                raise Exception(f"Check your product structure. Error: {err}")
+            self.__download(
+                features,
+                bands,
+                threads,
+                outdir,
+                with_folder,
+                with_metadata,
+            )
 
             return None
 
         if not isinstance(products, dict):
             raise ValueError("Bad Arguments.")
 
-        try:
-            # INPE'S API returns only the footprint image asset
-            # so, to download the bands we need to search individually
-            # and then fill the feature's assets
+        products = cast(FeatureCollectionDict, products)
 
-            get_features_assets(products)
+        # INPE'S API returns only the footprint image asset
+        # so, to download the bands we need to search individually
+        # and then fill the feature's assets
 
-            self.__download(
-                products, bands, threads, outdir, with_folder, with_metadata
-            )
+        get_features_assets(products)
 
-        except Exception as err:
-            raise Exception(f"Check your product structure. Error: {err}")
+        self.__download(products, bands, threads, outdir, with_folder, with_metadata)
+
+        return None
 
     @staticmethod
-    def to_geodataframe(products: FeatureCollectionDict) -> GeoDataFrame:
+    def to_geodataframe(products: Mapping[str, Any]) -> GeoDataFrame:
         """
         Transform products list to a GeoDataFrame.
 
@@ -259,6 +257,8 @@ class Cbers4aAPI:
         Returns:
             GeoDataFrame of products.
         """
+        products = cast(FeatureCollectionDict, products)
+
         if not isinstance(products, dict):
             raise ValueError("Provide a valid product structure.")
 
