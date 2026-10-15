@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from datetime import date
-from typing import Union
+from typing import Union, cast
 
 from requests import HTTPError, Session
 
@@ -131,7 +131,7 @@ class Search:
             ],
         }
 
-    def __call__(self) -> FeatureCollectionDict:
+    def __call__(self) -> dict:
         """
         Make request using the search parameters.
 
@@ -163,7 +163,7 @@ class Search:
                 }
 
                 if collections is None:
-                    return feature_collection
+                    return cast(dict, feature_collection)
 
                 # For every collection...
                 for _, content in collections.items():
@@ -176,7 +176,7 @@ class Search:
                     # Append all collection features in one
                     feature_collection["features"].extend(content["features"])
 
-                return feature_collection
+                return cast(dict, feature_collection)
             except HTTPError as err:
                 raise HTTPError(
                     f"{response.status_code} - ERROR in query. Reason: {response.reason}. Exception: {err}"

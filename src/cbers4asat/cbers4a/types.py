@@ -84,7 +84,6 @@ class FeatureDict(TypedDict):
     geometry: PolygonDict
     properties: dict[str, Any]
     stac_version: str
-    stac_extensions: list[str]
     id: str
     collection: str
     bbox: list[float]
