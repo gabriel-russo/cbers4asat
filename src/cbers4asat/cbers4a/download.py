@@ -1,12 +1,8 @@
 # -*- coding: utf-8 -*-
-# Standard Libraries
 from os import makedirs
-from os.path import join, basename, exists
+from os.path import basename, exists, join, normpath
 
-# PyPi Packages
-from requests import Session, HTTPError
-from requests.adapters import HTTPAdapter
-from urllib3.util import Retry
+from requests import HTTPError, Session
 
 
 class Download:
@@ -15,20 +11,10 @@ class Download:
     """
 
     def __init__(self):
-        retries = Retry(
-            total=3,
-            connect=3,
-            read=3,
-            status=3,
-            other=3,
-            backoff_factor=1,
-            status_forcelist=[500, 501, 502, 503, 504],
-            allowed_methods={"GET"},
-        )
-        self.session = Session()
-        self.session.mount("http://", HTTPAdapter(max_retries=retries))
+        self.__session = Session()
+        self.__session.headers.update({"User-Agent": "cbers4asat (Python)"})
 
-    def download(self, url: str, credential: str, outdir: str) -> None | Exception:
+    def download(self, url: str, credential: str, outdir: str) -> None:
         """
         Download the asset.
 
@@ -36,30 +22,34 @@ class Download:
             url: URL pointing to asset/band .TIFF
             credential: e-mail used in the explorer inpe platform.
             outdir: Output directory
+
         Raise:
-            ``Exception`` if any http error occurs.
+            ``HTTPError`` if any http error occurs.
         """
         if not exists(outdir):
             makedirs(outdir, exist_ok=True)
 
         geotiff = basename(url)
 
-        outfile = join(outdir, geotiff)
+        outfile = normpath(join(outdir, geotiff))
 
-        with self.session as session:
+        with self.__session as session:
             try:
-                response = session.get(
+                res = session.get(
                     url,
                     params={"email": credential},
                     stream=True,
                     allow_redirects=True,
                 )
-                response.raise_for_status()
+
+                res.raise_for_status()
+
                 with open(outfile, "wb") as f:
-                    for chunk in response.iter_content(chunk_size=4096):
+                    for chunk in res.iter_content(chunk_size=4096):
                         if chunk:
                             f.write(chunk)
+
             except HTTPError as err:
-                raise Exception(
-                    f"{response.status_code} - ERROR in {url}. Reason: {response.reason}. Exception: {err}"
+                raise HTTPError(
+                    f"{res.status_code} - ERROR in {url}. Reason: {res.reason}. Exception: {err}"
                 )

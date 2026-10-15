@@ -1,54 +1,44 @@
 # -*- coding: utf-8 -*-
 from datetime import date
-from os import remove
+
 import pytest
-from cbers4asat import Cbers4aAPI, Collections as col
 from shapely.geometry import Polygon
-from mocks import (
-    MockStacFeatureCollectionResponse,
-    MockStacFeatureResponse,
-    MockStacFeatureCollectionEmptyResponse,
-    feature_without_bands,
-    feature_with_bands,
-)
+
+from cbers4asat import Cbers4aAPI
+from cbers4asat import Collections as col
+from cbers4asat.cbers4a import FeatureCollectionDict
+from mocks import feature_with_bands, feature_without_bands
+
+EXPECTED_RESULT_FROM_EMPTY_QUERY_RESPONSE: FeatureCollectionDict = {
+    "type": "FeatureCollection",
+    "features": [],
+}
+
+EXPECTED_RESULT_FROM_QUERY = {
+    "type": "FeatureCollection",
+    "features": [feature_without_bands],
+}
+
+EXPECTED_RESULT_AFTER_QUERY_ITEM_ASSETS = {
+    "type": "FeatureCollection",
+    "features": [feature_with_bands],
+}
 
 
 class TestCbers4aAPI:
-    api = Cbers4aAPI("test@test.com")
+    def test_email(self, api):
+        assert "test@test.com" in api.email
 
-    expected_result_from_empty_query_response = {
-        "type": "FeatureCollection",
-        "features": [],
-    }
-
-    expected_result_from_query = {
-        "type": "FeatureCollection",
-        "features": [feature_without_bands],
-    }
-
-    expected_result_after_query_item_assets = {
-        "type": "FeatureCollection",
-        "features": [feature_with_bands],
-    }
-
-    def test_email(self):
-        assert "test@test.com" in self.api.email
-
-    def test_set_email(self):
-        self.api.email = "another@test.com"
-        assert self.api.email == "another@test.com"
+    def test_set_email(self, api):
+        api.email = "another@test.com"
+        assert api.email == "another@test.com"
 
     def test_empty_email(self):
         api2 = Cbers4aAPI()
         assert api2.email is None
 
-    def test_query_bbox(self, monkeypatch):
-        def mock_post(*args, **kwargs):
-            return MockStacFeatureCollectionResponse()
-
-        monkeypatch.setattr("requests.Session.post", mock_post)
-
-        result = self.api.query(
+    def test_query_bbox(self, api, mock_collection_response):
+        result = api.query(
             location=[-63.9, -8.8, -63.7, -8.7],
             initial_date=date(2021, 1, 1),
             end_date=date(2021, 2, 1),
@@ -57,14 +47,9 @@ class TestCbers4aAPI:
             collections=["CBERS4A_WPM_L4_DN"],
         )
 
-        assert self.expected_result_from_query == result
+        assert EXPECTED_RESULT_FROM_QUERY == result
 
-    def test_query_geometry(self, monkeypatch):
-        def mock_post(*args, **kwargs):
-            return MockStacFeatureCollectionResponse()
-
-        monkeypatch.setattr("requests.Session.post", mock_post)
-
+    def test_query_geometry(self, api, mock_collection_response):
         bbox = Polygon(
             [
                 [-63.911934, -8.738337],
@@ -74,7 +59,7 @@ class TestCbers4aAPI:
             ]
         )
 
-        result = self.api.query(
+        result = api.query(
             location=bbox,
             initial_date=date(2021, 1, 1),
             end_date=date(2021, 2, 1),
@@ -83,15 +68,10 @@ class TestCbers4aAPI:
             collections=["CBERS4A_WPM_L4_DN"],
         )
 
-        assert self.expected_result_from_query == result
+        assert EXPECTED_RESULT_FROM_QUERY == result
 
-    def test_query_pathrow(self, monkeypatch):
-        def mock_post(*args, **kwargs):
-            return MockStacFeatureCollectionResponse()
-
-        monkeypatch.setattr("requests.Session.post", mock_post)
-
-        result = self.api.query(
+    def test_query_pathrow(self, api, mock_collection_response):
+        result = api.query(
             location=(206, 133),
             initial_date=date(2021, 1, 1),
             end_date=date(2021, 2, 1),
@@ -100,15 +80,10 @@ class TestCbers4aAPI:
             collections=["CBERS4A_WPM_L4_DN"],
         )
 
-        assert self.expected_result_from_query == result
+        assert EXPECTED_RESULT_FROM_QUERY == result
 
-    def test_query_collections_with_enum(self, monkeypatch):
-        def mock_post(*args, **kwargs):
-            return MockStacFeatureCollectionResponse()
-
-        monkeypatch.setattr("requests.Session.post", mock_post)
-
-        result = self.api.query(
+    def test_query_collections_with_enum(self, api, mock_collection_response):
+        result = api.query(
             location=(206, 133),
             initial_date=date(2021, 1, 1),
             end_date=date(2021, 2, 1),
@@ -117,15 +92,10 @@ class TestCbers4aAPI:
             collections=[col.CBERS4A_WPM_L4_DN, col.CBERS4A_WPM_L2_DN],
         )
 
-        assert self.expected_result_from_query == result
+        assert EXPECTED_RESULT_FROM_QUERY == result
 
-    def test_query_collections_mix(self, monkeypatch):
-        def mock_post(*args, **kwargs):
-            return MockStacFeatureCollectionResponse()
-
-        monkeypatch.setattr("requests.Session.post", mock_post)
-
-        result = self.api.query(
+    def test_query_collections_mix(self, api, mock_collection_response):
+        result = api.query(
             location=(206, 133),
             initial_date=date(2021, 1, 1),
             end_date=date(2021, 2, 1),
@@ -134,35 +104,20 @@ class TestCbers4aAPI:
             collections=["CBERS4A_WPM_L4_DN", col.CBERS4A_WPM_L2_DN],
         )
 
-        assert self.expected_result_from_query == result
+        assert EXPECTED_RESULT_FROM_QUERY == result
 
-    def test_query_by_id_str(self, monkeypatch):
-        def mock_get(*args, **kwargs):
-            return MockStacFeatureResponse()
+    def test_query_by_id_str(self, api, mock_item_response):
+        result = api.query_by_id(scene_id="ABC123", collection="y")
 
-        monkeypatch.setattr("requests.Session.get", mock_get)
+        assert EXPECTED_RESULT_AFTER_QUERY_ITEM_ASSETS == result
 
-        result = self.api.query_by_id(scene_id="ABC123", collection="y")
+    def test_query_by_id_list(self, api, mock_item_response):
+        result = api.query_by_id(scene_id=["ABC123"], collection="y")
 
-        assert self.expected_result_after_query_item_assets == result
+        assert EXPECTED_RESULT_AFTER_QUERY_ITEM_ASSETS == result
 
-    def test_query_by_id_list(self, monkeypatch):
-        def mock_get(*args, **kwargs):
-            return MockStacFeatureResponse()
-
-        monkeypatch.setattr("requests.Session.get", mock_get)
-
-        result = self.api.query_by_id(scene_id=["ABC123"], collection="y")
-
-        assert self.expected_result_after_query_item_assets == result
-
-    def test_query_empty_response(self, monkeypatch):
-        def mock_post(*args, **kwargs):
-            return MockStacFeatureCollectionEmptyResponse()
-
-        monkeypatch.setattr("requests.Session.post", mock_post)
-
-        result = self.api.query(
+    def test_query_empty_response(self, api, mock_empty_collection_response):
+        result = api.query(
             location=[-63.9, -8.8, -63.7, -8.7],
             initial_date=date(2021, 1, 1),
             end_date=date(2021, 2, 1),
@@ -171,10 +126,10 @@ class TestCbers4aAPI:
             collections=["CBERS4A_WPM_L4_DN"],
         )
 
-        assert self.expected_result_from_empty_query_response == result
+        assert EXPECTED_RESULT_FROM_EMPTY_QUERY_RESPONSE == result
 
-    def test_to_geodataframe(self):
-        gdf = self.api.to_geodataframe(self.expected_result_from_query)
+    def test_to_geodataframe(self, api):
+        gdf = api.to_geodataframe(EXPECTED_RESULT_FROM_QUERY)
 
         assert "id" in list(gdf.columns)
         assert "geometry" in list(gdf.columns)
@@ -193,49 +148,49 @@ class TestCbers4aAPI:
         assert len(gdf) == 1
 
     def test_missing_credentials_exception(self):
-        with pytest.raises(Exception):
+        with pytest.raises(ValueError):
             api = Cbers4aAPI()
-            api.download(self.expected_result_from_query, bands=["blue"])
+            api.download(EXPECTED_RESULT_FROM_QUERY, bands=["blue"])
 
     def test_empty_credentials_exception(self):
-        with pytest.raises(Exception):
+        with pytest.raises(ValueError):
             api = Cbers4aAPI("")
-            api.download(self.expected_result_from_query, bands=["blue"])
+            api.download(EXPECTED_RESULT_FROM_QUERY, bands=["blue"])
 
     def test_missing_credentials_exception_geodataframe(self):
-        with pytest.raises(Exception):
+        with pytest.raises(ValueError):
             api = Cbers4aAPI("")
-            gdf = api.to_geodataframe(self.expected_result_from_query)
+            gdf = api.to_geodataframe(EXPECTED_RESULT_FROM_QUERY)
             api.download(gdf, bands=["blue"])
 
-    def test_download(self, monkeypatch, tmp_path):
-        def mock_get(*args, **kwargs):
-            return MockStacFeatureResponse()
+    def test_wrong_threads_values_negative(self, api):
+        with pytest.raises(ValueError):
+            api.download(EXPECTED_RESULT_FROM_QUERY, bands=["blue"], threads=-10)
 
-        monkeypatch.setattr("requests.Session.get", mock_get)
+    def test_wrong_threads_values_zero(self, api):
+        with pytest.raises(ValueError):
+            api.download(EXPECTED_RESULT_FROM_QUERY, bands=["blue"], threads=0)
 
-        self.api.download(
-            products=self.expected_result_from_query,
+    def test_band_not_available_for_satellite(self, api, mock_item_response):
+        with pytest.raises(ValueError):
+            api.download(EXPECTED_RESULT_AFTER_QUERY_ITEM_ASSETS, bands=["pan"])
+
+    def test_download(self, api, mock_item_response, tmp_path):
+        api.download(
+            products=EXPECTED_RESULT_FROM_QUERY,
             bands=["blue"],
             threads=1,
             outdir=tmp_path.as_posix(),
             with_folder=True,
         )
 
-        with open(f"{tmp_path.as_posix()}/ABC123/image.tif", "rb") as f:
+        with open(tmp_path / "ABC123" / "image.tif", "rb") as f:
             assert f.read() == b"dummydata"
 
-        remove(f"{tmp_path.as_posix()}/ABC123/image.tif")
+    def test_download_gdf(self, api, mock_item_response, tmp_path):
+        gdf = api.to_geodataframe(EXPECTED_RESULT_FROM_QUERY)
 
-    def test_download_gdf(self, monkeypatch, tmp_path):
-        def mock_get(*args, **kwargs):
-            return MockStacFeatureResponse()
-
-        monkeypatch.setattr("requests.Session.get", mock_get)
-
-        gdf = self.api.to_geodataframe(self.expected_result_from_query)
-
-        self.api.download(
+        api.download(
             products=gdf,
             bands=["blue"],
             threads=1,
@@ -243,7 +198,5 @@ class TestCbers4aAPI:
             with_folder=True,
         )
 
-        with open(f"{tmp_path.as_posix()}/ABC123/image.tif", "rb") as f:
+        with open(tmp_path / "ABC123" / "image.tif", "rb") as f:
             assert f.read() == b"dummydata"
-
-        remove(f"{tmp_path.as_posix()}/ABC123/image.tif")

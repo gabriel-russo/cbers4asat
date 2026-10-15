@@ -1,76 +1,69 @@
 [project]
 name = "cbers4asat"
-version = "0.10.1"
+version = "0.10.2"
 description = "Biblioteca Python para realizar a busca e processamento de imagens dos satélites CBERS-04A e AMAZONIA-1"
 authors = [
     { name = "Gabriel Russo", email = "gabrielrusso@protonmail.com" }]
-license = { file = "LICENSE" }
+license = "MIT"
+license-files = ["LICENSE"]
 keywords = ["cbers", "cbers4a", "cbers-04a", "cbers-4a", "amazonia-1", "remote sensing", "geoprocessing"]
 readme = "README.md"
-requires-python = ">=3.11,<4"
+requires-python = ">=3.12,<4"
 classifiers = [
-    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Topic :: Scientific/Engineering :: GIS"
 ]
 dependencies = [
-    "geopandas>=1.1.1",
-    "requests>=2.32.5",
+    "geopandas>=1.2.0",
+    "requests>=2.34.2",
 ]
 
 [project.optional-dependencies]
-dev = [
-    "hatch>=1.14.2"
-]
 tools = [
-    "rasterio>=1.4.3",
-    "numpy>=2.3.3",
-    "scikit-image>=0.25.2",
-    "geojson>=3.2.0",
+    "rasterio>=1.5.2",
+    "numpy>=2.5.4",
+    "scikit-image>=0.26.0",
+    "geojson>=3.3.0",
     "geomet>=1.1.0"
 ]
 
-[build-system]
-build-backend = "hatchling.build"
-requires = ["hatchling >= 1.26, < 1.32"]
-
-[tool.hatch.build.targets.wheel]
-packages = ["src/cbers4asat"]
-
-[tool.hatch.build]
-exclude = [
-    "tests/",
-    ".github/",
-    "cli/",
-    ".flake8",
-    "tox.ini",
-    "site"
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "ruff>=0.17.0",
+    "ty>=0.0.86",
 ]
-
-[tool.hatch.envs.default]
-dependencies = [
-    "tox>=4.30.2",
-    "black>=25.9.0"
-]
-
-[tool.hatch.envs.default.scripts]
-format = "black src/cbers4asat"
-test = "tox"
-
-[tool.hatch.envs.docs]
-dependencies = [
+docs = [
     "mkdocs>=1.6.1",
     "mkdocstrings>=0.30.1",
-    "mkdocstrings-python>=1.18.2"
+    "mkdocstrings-python>=1.18.2",
 ]
 
-[tool.hatch.envs.docs.scripts]
-serve = "mkdocs serve"
-build = "mkdocs build --clean --strict"
+[build-system]
+build-backend = "uv_build"
+requires = ["uv_build>=0.13.0"]
+
+[tool.uv.build-backend]
+module-name = "cbers4asat"
+module-root = "src"
+
+[tool.ruff]
+line-length = 88
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F"]
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["tests"]
 
 [project.urls]
 "Homepage" = "https://cbers4asat.readthedocs.io/pt_BR/latest"

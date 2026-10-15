@@ -1,7 +1,8 @@
 from os import getcwd
 from os.path import basename, join
 from typing import Literal
-from requests import Session, HTTPError
+
+from requests import HTTPError, Session
 
 
 def grid_download(
@@ -24,11 +25,11 @@ def grid_download(
     """
     grids = {
         "cbers4a": {
-            "mux": "http://www.obt.inpe.br/OBT/assuntos/catalogo-cbers-amz-1/grid_cbers4a_mux.kmz",
-            "wfi": "http://www.obt.inpe.br/OBT/assuntos/catalogo-cbers-amz-1/grid_cbers4a_wfi.kmz",
+            "mux": "https://data.inpe.br/big/data/diotg/galeria/Grade_CBERS4A_MUX.kml",
+            "wfi": "https://data.inpe.br/big/data/diotg/galeria/Grade_CBERS4A_WFI.kml",
         },
         "amazonia1": {
-            "wfi": "http://www.obt.inpe.br/OBT/assuntos/catalogo-cbers-amz-1/grid_amazonia1_wfi_sa.kmz"
+            "wfi": "https://data.inpe.br/big/data/diotg/galeria/Grade_AMAZONIA1_WFI_AMSul.kml"
         },
     }
 

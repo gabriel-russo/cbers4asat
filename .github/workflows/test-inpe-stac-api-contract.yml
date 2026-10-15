@@ -1,4 +1,4 @@
-name: Check INPE STAC API compatibility
+name: Test INPE STAC API contract
 
 on:
   workflow_dispatch:
@@ -9,12 +9,12 @@ jobs:
   check-compatibility:
     runs-on: ubuntu-latest
     steps:
-      - name: Run code to check STAC API compatibility
-        run: |
-          python -m pip install --upgrade pip
-          pip install cbers4asat
+      - name: Install uv
+        uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884
 
-          python3 -c \
+      - name: Run code to Test INPE STAC API contract
+        run: |
+          uvx --from cbers4asat python -c \
           'from cbers4asat import Cbers4aAPI;\
           api = Cbers4aAPI();\
           p = api.query_by_id(\
@@ -22,7 +22,7 @@ jobs:
             collection="CBERS4A_WPM_L4_DN");\
           print(p)'
 
-          python3 -c \
+          uvx --from cbers4asat python -c \
           'from cbers4asat import Cbers4aAPI;\
           from datetime import date;\
           api = Cbers4aAPI();\
