@@ -16,7 +16,7 @@ def get_features_assets(feature_collection: FeatureCollectionDict) -> None:
 
         search.collection(feature["collection"])
 
-        features = search().get("features")
+        features: list = search()["features"]
 
         if not len(features):
             raise Exception("Item not found.")

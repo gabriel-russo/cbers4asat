@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import date
 from os import cpu_count, getcwd
 from os.path import isdir, join
@@ -29,15 +29,15 @@ class Cbers4aAPI:
         email: Sign-in e-mail used at https://www.dgi.inpe.br/catalogo/explore
     """
 
-    def __init__(self, email: Optional[str] = None):
+    def __init__(self, email: Optional[str] = None) -> None:
         self._email = email
 
     @property
-    def email(self):
+    def email(self) -> str | None:
         return self._email
 
     @email.setter
-    def email(self, email: str):
+    def email(self, email: str) -> None:
         self._email = email
 
     @staticmethod
@@ -48,7 +48,7 @@ class Cbers4aAPI:
         cloud: int,
         limit: int,
         collections: Union[list[str], list[Collections]],
-    ) -> dict:
+    ) -> dict[str, Any]:
         """
         Query Images from INPE's catalog
 
@@ -83,8 +83,6 @@ class Cbers4aAPI:
 
         Returns:
             dict: Dict with GeoJSON-like format
-        Raises:
-            Exception: If any input is invalid.
         """
         search = Search()
 
@@ -109,7 +107,7 @@ class Cbers4aAPI:
     @staticmethod
     def query_by_id(
         scene_id: Union[List[str], str], collection: Union[str, Collections]
-    ) -> FeatureCollectionDict:
+    ) -> dict[str, Any]:
         """
         Search a product by id
 
@@ -133,10 +131,13 @@ class Cbers4aAPI:
         outdir: str,
         with_folder: bool,
         with_metadata: bool,
-    ):
+    ) -> None:
         if threads == -1:
             nproc = cpu_count()
             threads = nproc if nproc is not None else 4
+
+        if not self.email:
+            raise ValueError("Credentials not provided!")
 
         tasks = []
         root = outdir
@@ -158,11 +159,10 @@ class Cbers4aAPI:
                     tasks.append((url_xml, self.email, outdir))
 
         with ThreadPoolExecutor(max_workers=threads) as t_pool:
-            for task in tasks:
-                f = t_pool.submit(Download().download, *task)
+            futures = [t_pool.submit(Download().download, *task) for task in tasks]
 
+            for f in as_completed(futures):
                 exc = f.exception()
-
                 if exc is not None:
                     raise exc
 
@@ -174,7 +174,7 @@ class Cbers4aAPI:
         outdir: str = getcwd(),
         with_folder: bool = False,
         with_metadata: bool = False,
-    ):
+    ) -> None:
         """
         Download bands from all given scenes
 
@@ -186,7 +186,7 @@ class Cbers4aAPI:
             with_folder: Group scene bands in a sub folder
             with_metadata: Download band's metadata (XML)
         Examples:
-            - download(my_query_result, ['red', 'green'], 3, './downlaods', true)
+            - download(my_query_result, ['red', 'green'], 3, './downloads', true)
             - download(my_query_result, ['red'], outdir='./downloads', with_folder=true)
             - download(my_query_result, ['blue'], with_metadata=True)
         Returns:
