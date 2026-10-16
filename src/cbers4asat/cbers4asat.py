@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import date
 from os import cpu_count, getcwd
 from os.path import isdir, join
@@ -159,11 +159,10 @@ class Cbers4aAPI:
                     tasks.append((url_xml, self.email, outdir))
 
         with ThreadPoolExecutor(max_workers=threads) as t_pool:
-            for task in tasks:
-                f = t_pool.submit(Download().download, *task)
+            futures = [t_pool.submit(Download().download, *task) for task in tasks]
 
+            for f in as_completed(futures):
                 exc = f.exception()
-
                 if exc is not None:
                     raise exc
 
