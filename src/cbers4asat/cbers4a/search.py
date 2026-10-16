@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from datetime import date
-from typing import Union, cast
+from typing import Any, Union, cast
 
 from requests import HTTPError, Session
 
@@ -25,14 +25,14 @@ class SearchItem:
         self.__ids = []
         self.__collection: str = ""
 
-    def __call__(self) -> FeatureCollectionDict:
+    def __call__(self) -> dict[str, Any]:
         """
         Make request using the search parameters.
 
         Return:
             GeoJson-like dictionary.
         Raise:
-            ``Exception`` if any http error.
+            ``HTTPError`` if any http error.
         """
         features: list[FeatureDict] = []
 
@@ -53,7 +53,7 @@ class SearchItem:
                         features.append(feature)
 
                 except HTTPError as err:
-                    raise Exception(
+                    raise HTTPError(
                         f"{response.status_code} - ERROR searching {id_}. Reason: {response.reason}. Exception: {err}"
                     )
 
@@ -131,7 +131,7 @@ class Search:
             ],
         }
 
-    def __call__(self) -> dict:
+    def __call__(self) -> dict[str, Any]:
         """
         Make request using the search parameters.
 
